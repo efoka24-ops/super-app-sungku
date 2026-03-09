@@ -1,0 +1,67 @@
+{
+  "TXN_1773057264770": {
+    "transactionId": "TXN_1773057264770",
+    "phoneNumber": "656789012",
+    "operator": "orange",
+    "amount": 10000,
+    "description": "test",
+    "userId": "anonymous",
+    "code": "#150*1*1*1*656789012*10000#",
+    "status": "pending",
+    "initiatedAt": "2026-03-09T11:54:24.781Z",
+    "expiresAt": "2026-03-09T11:59:24.796Z",
+    "completedAt": null
+  },
+  "TXN_1773057345605": {
+    "transactionId": "TXN_1773057345605",
+    "phoneNumber": "656789012",
+    "operator": "orange",
+    "amount": 10000,
+    "description": "payment",
+    "userId": "anonymous",
+    "code": "#150*1*1*1*656789012*10000#",
+    "status": "pending",
+    "initiatedAt": "2026-03-09T11:55:45.606Z",
+    "expiresAt": "2026-03-09T12:00:45.606Z",
+    "completedAt": null
+  },
+  "TXN_1773057361692": {
+    "transactionId": "TXN_1773057361692",
+    "phoneNumber": "687654321",
+    "operator": "mtn",
+    "amount": 50000,
+    "description": "payment",
+    "userId": "anonymous",
+    "code": "*126*1*1*687654321*50000#",
+    "status": "pending",
+    "initiatedAt": "2026-03-09T11:56:01.695Z",
+    "expiresAt": "2026-03-09T12:01:01.695Z",
+    "completedAt": null
+  },
+  "TXN_1773058852849": {
+    "transactionId": "TXN_1773058852849",
+    "phoneNumber": "691227149",
+    "operator": "mtn",
+    "amount": 10000,
+    "description": "payment",
+    "userId": "anonymous",
+    "code": "*126*1*1*691227149*10000#",
+    "status": "pending",
+    "initiatedAt": "2026-03-09T12:20:52.928Z",
+    "expiresAt": "2026-03-09T12:25:52.928Z",
+    "completedAt": null
+  },
+  "TXN_1773067424096": {
+    "transactionId": "TXN_1773067424096",
+    "phoneNumber": "691227149",
+    "operator": "mtn",
+    "amount": 4900,
+    "description": "payment",
+    "userId": "anonymous",
+    "code": "*126*1*1*691227149*4900#",
+    "status": "pending",
+    "initiatedAt": "2026-03-09T14:43:44.100Z",
+    "expiresAt": "2026-03-09T14:48:44.100Z",
+    "completedAt": null
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "691227149": {
+    "userId": "691227149",
+    "firstName": "FOKA",
+    "lastName": "MANUEL",
+    "transfers": 0,
+    "contacts": 0,
+    "miniApps": 0,
+    "balance": 0,
+    "transactions": [],
+    "updatedAt": "2026-03-09T14:43:12.691Z"
+  },
+  "696317216": {
+    "userId": "696317216",
+    "firstName": "Emmanuel",
+    "lastName": "Foka",
+    "transfers": 0,
+    "contacts": 0,
+    "miniApps": 1,
+    "balance": 0,
+    "transactions": [],
+    "updatedAt": "2026-03-09T13:38:49.021Z"
+  },
+  "+237656298190": {
+    "transfers": 47,
+    "contacts": 7,
+    "miniApps": 0,
+    "updatedAt": "2026-03-09T14:02:11.229Z"
+  }
+}

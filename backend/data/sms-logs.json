@@ -1,0 +1,85 @@
+[
+  {
+    "id": "1773063065449",
+    "phone": "237678758976",
+    "code": "515845",
+    "provider": "afrimotech",
+    "status": "sent",
+    "timestamp": "2026-03-09T13:31:05.449Z"
+  },
+  {
+    "id": "1773063283564",
+    "phone": "237691227149",
+    "code": "613730",
+    "provider": "afrimotech",
+    "status": "sent",
+    "timestamp": "2026-03-09T13:34:43.564Z"
+  },
+  {
+    "id": "1773063482795",
+    "phone": "237678758976",
+    "code": "515845",
+    "status": "verified",
+    "timestamp": "2026-03-09T13:38:02.796Z"
+  },
+  {
+    "id": "1773063529082",
+    "phone": "237696317216",
+    "code": "245016",
+    "provider": "afrimotech",
+    "status": "sent",
+    "timestamp": "2026-03-09T13:38:49.082Z"
+  },
+  {
+    "id": "1773063539429",
+    "phone": "237696317216",
+    "code": "245016",
+    "status": "verified",
+    "timestamp": "2026-03-09T13:38:59.429Z"
+  },
+  {
+    "id": "1773063907532",
+    "phone": "237696317216",
+    "code": "763424",
+    "provider": "afrimotech",
+    "status": "sent",
+    "timestamp": "2026-03-09T13:45:07.532Z"
+  },
+  {
+    "id": "1773063925599",
+    "phone": "237696317216",
+    "code": "763424",
+    "status": "verified",
+    "timestamp": "2026-03-09T13:45:25.599Z"
+  },
+  {
+    "id": "1773064035971",
+    "phone": "237691227142",
+    "code": "110039",
+    "provider": "afrimotech",
+    "status": "sent",
+    "timestamp": "2026-03-09T13:47:15.971Z"
+  },
+  {
+    "id": "1773064043875",
+    "phone": "237691227142",
+    "code": "110039",
+    "status": "verified",
+    "timestamp": "2026-03-09T13:47:23.875Z"
+  },
+  {
+    "id": "1773064903686",
+    "phone": "237656298190",
+    "code": "563122",
+    "provider": "afrimotech",
+    "status": "sent",
+    "timestamp": "2026-03-09T14:01:43.686Z"
+  },
+  {
+    "id": "1773064911336",
+    "phone": "237656298190",
+    "code": "563122",
+    "status": "verified",
+    "timestamp": "2026-03-09T14:01:51.336Z"
+  }
+]

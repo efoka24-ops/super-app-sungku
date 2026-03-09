@@ -1,0 +1,15 @@
+[
+  {
+    "id": "sungku-send",
+    "name": "Sungku Send",
+    "category": "finance",
+    "description": "Envoyez de l'argent par USSD facilement",
+    "published": true,
+    "featured": true,
+    "installations": 0,
+    "rating": 0,
+    "uploadedAt": "2026-03-09",
+    "fileName": "sungku-send.apk",
+    "fileSize": 5.2
+  }
+]

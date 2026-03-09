@@ -1,0 +1,26 @@
+{
+  "fr": [
+    {
+      "id": "faq_1",
+      "question": "Comment changer mon mot de passe ?",
+      "answer": "Allez dans Paramètres > Sécurité > Changer le mot de passe."
+    },
+    {
+      "id": "faq_2",
+      "question": "Comment installer une mini app ?",
+      "answer": "Depuis Mini Apps, sélectionnez une app puis appuyez sur Installer."
+    }
+  ],
+  "en": [
+    {
+      "id": "faq_1",
+      "question": "How do I change my password?",
+      "answer": "Go to Settings > Security > Change password."
+    },
+    {
+      "id": "faq_2",
+      "question": "How can I install a mini app?",
+      "answer": "From Mini Apps, pick an app and tap Install."
+    }
+  ]
+}

@@ -1,0 +1,62 @@
+{
+  "691227142": {
+    "userId": "691227142",
+    "firstName": "Emmanuel",
+    "lastName": "Fokaq",
+    "phone": "691227142",
+    "email": "efoka24@gmail.com",
+    "password": "123456",
+    "verified": false,
+    "language": "fr",
+    "createdAt": "2026-03-09T13:47:15.918Z",
+    "otp": "948407"
+  },
+  "691227149": {
+    "userId": "691227149",
+    "firstName": "FOKA",
+    "lastName": "MANUEL",
+    "phone": "691227149",
+    "email": "",
+    "password": "123456",
+    "verified": false,
+    "language": "fr",
+    "createdAt": "2026-03-09T13:34:43.483Z",
+    "otp": "679126"
+  },
+  "696317216": {
+    "userId": "696317216",
+    "firstName": "Emmanuel",
+    "lastName": "Foka",
+    "phone": "696317216",
+    "email": "efoka24@gmail.com",
+    "password": "123456",
+    "verified": false,
+    "language": "fr",
+    "createdAt": "2026-03-09T13:38:49.021Z",
+    "otp": "808404"
+  },
+  "+237696317216": {
+    "userId": "+237696317216",
+    "firstName": "Emmanuel",
+    "lastName": "Foka",
+    "phone": "+237696317216",
+    "email": "efoka24@gmail.com",
+    "password": "123456",
+    "verified": false,
+    "language": "fr",
+    "createdAt": "2026-03-09T13:45:07.266Z",
+    "otp": "166123"
+  },
+  "+237656298190": {
+    "userId": "+237656298190",
+    "firstName": "Emmanuel",
+    "lastName": "Foka",
+    "phone": "+237656298190",
+    "email": "efoka24@gmail.com",
+    "password": "123456",
+    "verified": false,
+    "language": "fr",
+    "createdAt": "2026-03-09T14:01:43.652Z",
+    "otp": "413444"
+  }
+}

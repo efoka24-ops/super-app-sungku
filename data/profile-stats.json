@@ -1,0 +1,14 @@
+{
+  "test-user": {
+    "transfers": 30,
+    "contacts": 20,
+    "miniApps": 6,
+    "updatedAt": "2026-03-08T19:12:46.031Z"
+  },
+  "+237678758976": {
+    "transfers": 24,
+    "contacts": 24,
+    "miniApps": 7,
+    "updatedAt": "2026-03-08T19:14:37.541Z"
+  }
+}

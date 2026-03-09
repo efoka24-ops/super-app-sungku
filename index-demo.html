@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sungku - Super App Africaine</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+        .gradient-emerald { background: linear-gradient(135deg, #10B981 0%, #059669 100%); }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <div id="root"></div>
+
+    <!-- Navigation Bottom -->
+    <div id="nav" class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-10">
+        <div class="max-w-lg mx-auto flex justify-around items-center h-16">
+            <button onclick="showPage('home')" class="nav-btn active" data-page="home">
+                <i class="lucide" data-lucide="home"></i>
+                <span>Accueil</span>
+            </button>
+            <button onclick="showPage('payments')" class="nav-btn" data-page="payments">
+                <i class="lucide" data-lucide="credit-card"></i>
+                <span>Paiements</span>
+            </button>
+            <button onclick="showPage('miniapps')" class="nav-btn" data-page="miniapps">
+                <i class="lucide" data-lucide="grid-3x3"></i>
+                <span>Mini Apps</span>
+            </button>
+            <button onclick="showPage('messages')" class="nav-btn" data-page="messages">
+                <i class="lucide" data-lucide="message-circle"></i>
+                <span>Messages</span>
+            </button>
+            <button onclick="showPage('profile')" class="nav-btn" data-page="profile">
+                <i class="lucide" data-lucide="user"></i>
+                <span>Profil</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Pages -->
+    <div class="pb-20">
+        <!-- HOME -->
+        <div id="home-page" class="page">
+            <div class="gradient-emerald px-6 pt-12 pb-8 rounded-b-3xl">
+                <div class="flex justify-between items-center mb-8">
+                    <div>
+                        <p class="text-white/80 text-sm">Bonjour,</p>
+                        <h1 class="text-white text-2xl font-bold">Emmanuel 👋</h1>
+                    </div>
+                    <button class="relative">
+                        <i class="lucide text-white" data-lucide="bell" style="width:24px; height:24px;"></i>
+                        <span class="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full text-white text-xs flex items-center justify-center">3</span>
+                    </button>
+                </div>
+
+                <div class="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20">
+                    <div class="flex justify-between items-start mb-4">
+                        <div>
+                            <p class="text-white/80 text-sm mb-2">Solde Sungku</p>
+                            <h2 class="text-white text-3xl font-bold">120 000 FCFA</h2>
+                        </div>
+                        <button class="text-white"><i class="lucide" data-lucide="eye" style="width:24px;height:24px;"></i></button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="px-6 mt-8">
+                <div class="grid grid-cols-4 gap-3">
+                    <button class="flex flex-col items-center gap-2 p-3 bg-emerald-50 rounded-xl hover:bg-emerald-100">
+                        <i class="lucide text-emerald-600" data-lucide="send" style="width:24px;height:24px;"></i>
+                        <span class="text-xs font-medium text-center">Envoyer</span>
+                    </button>
+                    <button class="flex flex-col items-center gap-2 p-3 bg-blue-50 rounded-xl hover:bg-blue-100">
+                        <i class="lucide text-blue-600" data-lucide="download" style="width:24px;height:24px;"></i>
+                        <span class="text-xs font-medium text-center">Recevoir</span>
+                    </button>
+                    <button class="flex flex-col items-center gap-2 p-3 bg-purple-50 rounded-xl hover:bg-purple-100">
+                        <i class="lucide text-purple-600" data-lucide="scan-line" style="width:24px;height:24px;"></i>
+                        <span class="text-xs font-medium text-center">Scanner</span>
+                    </button>
+                    <button class="flex flex-col items-center gap-2 p-3 bg-amber-50 rounded-xl hover:bg-amber-100">
+                        <i class="lucide text-amber-600" data-lucide="credit-card" style="width:24px;height:24px;"></i>
+                        <span class="text-xs font-medium text-center">Payer</span>
+                    </button>
+                </div>
+
+                <h3 class="text-lg font-bold mt-8 mb-4">Mini Apps Populaires</h3>
+                <div class="space-y-3">
+                    <div class="bg-white rounded-2xl p-4 shadow-sm flex items-start gap-4">
+                        <div class="w-16 h-16 bg-emerald-500 rounded-lg flex items-center justify-center flex-shrink-0">
+                            <i class="lucide text-white" data-lucide="package" style="width:28px;height:28px;"></i>
+                        </div>
+                        <div class="flex-1">
+                            <h4 class="font-bold text-gray-900">Sungku Delivery</h4>
+                            <p class="text-sm text-gray-500">Livraison express</p>
+                        </div>
+                        <i class="lucide text-gray-400" data-lucide="arrow-right" style="width:20px;height:20px;"></i>
+                    </div>
+                    <div class="bg-white rounded-2xl p-4 shadow-sm flex items-start gap-4">
+                        <div class="w-16 h-16 bg-red-500 rounded-lg flex items-center justify-center flex-shrink-0">
+                            <i class="lucide text-white" data-lucide="heart" style="width:28px;height:28px;"></i>
+                        </div>
+                        <div class="flex-1">
+                            <h4 class="font-bold text-gray-900">Pharmacie Plus</h4>
+                            <p class="text-sm text-gray-500">Médicaments en ligne</p>
+                        </div>
+                        <i class="lucide text-gray-400" data-lucide="arrow-right" style="width:20px;height:20px;"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PAYMENTS -->
+        <div id="payments-page" class="page hidden">
+            <div class="bg-white px-6 pt-12 pb-6 border-b">
+                <h1 class="text-2xl font-bold text-gray-900">Paiements</h1>
+                <p class="text-gray-500 text-sm mt-1">Gérez vos transactions</p>
+            </div>
+            <div class="px-6 mt-6">
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="bg-white rounded-2xl p-5 shadow-sm">
+                        <i class="lucide text-emerald-500" data-lucide="send" style="width:28px;height:28px;"></i>
+                        <h3 class="font-bold mt-3">Envoyer argent</h3>
+                        <p class="text-sm text-gray-500 mt-1">Vers Mobile Money</p>
+                    </div>
+                    <div class="bg-white rounded-2xl p-5 shadow-sm">
+                        <i class="lucide text-blue-500" data-lucide="download" style="width:28px;height:28px;"></i>
+                        <h3 class="font-bold mt-3">Recevoir</h3>
+                        <p class="text-sm text-gray-500 mt-1">Générer un QR</p>
+                    </div>
+                </div>
+
+                <h3 class="font-bold mt-8 mb-4">Transactions récentes</h3>
+                <div class="space-y-3">
+                    <div class="flex items-center justify-between p-3 bg-white rounded-lg">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center text-sm font-bold">MK</div>
+                            <div>
+                                <p class="font-medium">Marie Kamara</p>
+                                <p class="text-sm text-gray-500">Aujourd'hui 14:30</p>
+                            </div>
+                        </div>
+                        <p class="font-bold text-red-500">-15 000 FCFA</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MINI APPS -->
+        <div id="miniapps-page" class="page hidden">
+            <div class="bg-white px-6 pt-12 pb-6 border-b">
+                <h1 class="text-2xl font-bold text-gray-900">Mini Apps</h1>
+                <p class="text-gray-500 text-sm mt-1">Découvrez nos services</p>
+            </div>
+            <div class="px-6 mt-6">
+                <input type="text" placeholder="Chercher une app..." class="w-full px-4 py-3 border border-gray-200 rounded-xl">
+                
+                <h3 class="font-bold mt-6 mb-4">En vedette</h3>
+                <div class="space-y-3">
+                    <div class="bg-white rounded-xl p-4 cursor-pointer hover:shadow-md">
+                        <div class="flex items-center gap-3">
+                            <div class="w-12 h-12 bg-emerald-500 rounded-lg flex items-center justify-center">
+                                <i class="lucide text-white" data-lucide="send" style="width:24px;height:24px;"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold">Sungku Send</h4>
+                                <p class="text-sm text-gray-500">Transfert d'argent 🏆</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-xl p-4 cursor-pointer hover:shadow-md">
+                        <div class="flex items-center gap-3">
+                            <div class="w-12 h-12 bg-blue-500 rounded-lg flex items-center justify-center">
+                                <i class="lucide text-white" data-lucide="car" style="width:24px;height:24px;"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold">Sungku Ride</h4>
+                                <p class="text-sm text-gray-500">Motos & taxis</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MESSAGES -->
+        <div id="messages-page" class="page hidden">
+            <div class="bg-white px-6 pt-12 pb-6 border-b">
+                <h1 class="text-2xl font-bold text-gray-900">Messages</h1>
+            </div>
+            <div class="px-6 mt-6">
+                <div class="space-y-2">
+                    <div class="flex items-center gap-3 p-3 hover:bg-gray-50 rounded-lg cursor-pointer">
+                        <div class="w-12 h-12 bg-gray-300 rounded-full flex items-center justify-center font-bold">JD</div>
+                        <div class="flex-1">
+                            <h4 class="font-bold">Jean Diallo</h4>
+                            <p class="text-sm text-gray-500">Tu vas bien?</p>
+                        </div>
+                        <span class="text-xs text-gray-400">14:30</span>
+                    </div>
+                    <div class="flex items-center gap-3 p-3 hover:bg-gray-50 rounded-lg cursor-pointer bg-blue-50">
+                        <div class="w-12 h-12 bg-red-300 rounded-full flex items-center justify-center font-bold text-white">MK</div>
+                        <div class="flex-1">
+                            <h4 class="font-bold">Marie Kamara</h4>
+                            <p class="text-sm text-gray-500">Merci beaucoup!</p>
+                        </div>
+                        <span class="text-xs text-gray-400">10:15</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PROFILE -->
+        <div id="profile-page" class="page hidden">
+            <div class="bg-gradient-to-br from-emerald-500 to-emerald-600 px-6 pt-12 pb-12 text-white rounded-b-3xl">
+                <div class="flex items-center gap-4 mb-8">
+                    <div class="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center text-3xl">👤</div>
+                    <div>
+                        <h1 class="text-2xl font-bold">Emmanuel K.</h1>
+                        <p class="text-white/80">+225 07 XX XX XX</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="px-6 mt-6 space-y-3">
+                <div class="bg-white rounded-lg p-4 flex items-center justify-between cursor-pointer hover:bg-gray-50">
+                    <span class="font-medium">Sécurité</span>
+                    <i class="lucide text-gray-400" data-lucide="arrow-right" style="width:20px;height:20px;"></i>
+                </div>
+                <div class="bg-white rounded-lg p-4 flex items-center justify-between cursor-pointer hover:bg-gray-50">
+                    <span class="font-medium">Paramètres</span>
+                    <i class="lucide text-gray-400" data-lucide="arrow-right" style="width:20px;height:20px;"></i>
+                </div>
+                <div class="bg-white rounded-lg p-4 flex items-center justify-between cursor-pointer hover:bg-gray-50">
+                    <span class="font-medium">Support</span>
+                    <i class="lucide text-gray-400" data-lucide="arrow-right" style="width:20px;height:20px;"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        function showPage(pageName) {
+            // Hide all pages
+            document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
+            // Show selected page
+            document.getElementById(pageName + '-page').classList.remove('hidden');
+            
+            // Update nav
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            document.querySelector(`[data-page="${pageName}"]`).classList.add('active');
+        }
+
+        // Nav styling
+        const style = document.createElement('style');
+        style.textContent = `
+            .nav-btn {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                flex: 1;
+                height: 100%;
+                gap: 0.25rem;
+                color: #9CA3AF;
+            }
+            .nav-btn.active {
+                color: #10B981;
+            }
+            .nav-btn span {
+                font-size: 0.75rem;
+                font-weight: 500;
+            }
+            .nav-btn i {
+                width: 24px;
+                height: 24px;
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>

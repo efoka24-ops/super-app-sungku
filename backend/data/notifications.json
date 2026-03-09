@@ -1,0 +1,82 @@
+{
+  "678758976": [
+    {
+      "id": "notif_1773063065328_1",
+      "title": "Bienvenue sur Sungku",
+      "message": "Votre compte est prêt, commencez à envoyer et recevoir.",
+      "read": false,
+      "createdAt": "2026-03-09T13:31:05.328Z",
+      "type": "system"
+    }
+  ],
+  "691227142": [
+    {
+      "id": "notif_1773064035937_1",
+      "title": "Bienvenue sur Sungku",
+      "message": "Votre compte est prêt, commencez à envoyer et recevoir.",
+      "read": false,
+      "createdAt": "2026-03-09T13:47:15.937Z",
+      "type": "system"
+    }
+  ],
+  "691227149": [
+    {
+      "id": "notif_1773063283498_1",
+      "title": "Bienvenue sur Sungku",
+      "message": "Votre compte est prêt, commencez à envoyer et recevoir.",
+      "read": false,
+      "createdAt": "2026-03-09T13:34:43.498Z",
+      "type": "system"
+    }
+  ],
+  "696317216": [
+    {
+      "id": "notif_1773063529032_1",
+      "title": "Bienvenue sur Sungku",
+      "message": "Votre compte est prêt, commencez à envoyer et recevoir.",
+      "read": false,
+      "createdAt": "2026-03-09T13:38:49.032Z",
+      "type": "system"
+    }
+  ],
+  "undefined": [
+    {
+      "id": "notif_1773051412208_1",
+      "title": "Bienvenue sur Sungku",
+      "message": "Votre compte est prêt, commencez à envoyer et recevoir.",
+      "read": false,
+      "createdAt": "2026-03-09T10:16:52.212Z",
+      "type": "system"
+    }
+  ],
+  "+237678758976": [
+    {
+      "id": "notif_1773061536817_1",
+      "title": "Bienvenue sur Sungku",
+      "message": "Votre compte est prêt, commencez à envoyer et recevoir.",
+      "read": false,
+      "createdAt": "2026-03-09T13:05:36.817Z",
+      "type": "system"
+    }
+  ],
+  "+237696317216": [
+    {
+      "id": "notif_1773063907316_1",
+      "title": "Bienvenue sur Sungku",
+      "message": "Votre compte est prêt, commencez à envoyer et recevoir.",
+      "read": false,
+      "createdAt": "2026-03-09T13:45:07.316Z",
+      "type": "system"
+    }
+  ],
+  "+237656298190": [
+    {
+      "id": "notif_1773064903663_1",
+      "title": "Bienvenue sur Sungku",
+      "message": "Votre compte est prêt, commencez à envoyer et recevoir.",
+      "read": false,
+      "createdAt": "2026-03-09T14:01:43.664Z",
+      "type": "system"
+    }
+  ]
+}
