@@ -67,7 +67,7 @@ export default function Home() {
     // Fetch stats from backend
     const fetchStats = async () => {
       try {
-        const response = await fetch(`http://localhost:4000/api/profile/${user.userId}/stats`);
+        const response = await fetch(`https://sungku1-q3j44yhv.b4a.run/api/profile/${user.userId}/stats`);
         const data = await response.json();
         if (data.stats) {
           setStats(data.stats);
@@ -80,7 +80,7 @@ export default function Home() {
     // Fetch mini-apps catalog from backend
     const fetchMiniApps = async () => {
       try {
-        const response = await fetch('http://localhost:4000/api/admin/miniapps-catalog');
+        const response = await fetch('https://sungku1-q3j44yhv.b4a.run/api/admin/miniapps-catalog');
         const data = await response.json();
         if (data.miniApps && Array.isArray(data.miniApps)) {
           // Map backend data to component format

@@ -68,7 +68,7 @@ export default function SignUp() {
 
       // Send OTP via SMS (non-blocking - essai d'envoi)
       try {
-        const smsResult = await fetch('http://localhost:4000/api/sms/send-otp', {
+        const smsResult = await fetch('https://sungku1-q3j44yhv.b4a.run/api/sms/send-otp', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({

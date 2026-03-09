@@ -1,4 +1,4 @@
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:4000/api/admin';
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'https://sungku1-q3j44yhv.b4a.run/api/admin';
 
 export interface MiniApp {
   id: string;

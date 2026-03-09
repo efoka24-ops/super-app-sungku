@@ -75,7 +75,7 @@ export default function VerifyPhone() {
       const formattedPhone = SmsService.formatPhoneNumber(phone);
       
       // Verify OTP with backend
-      const result = await fetch('http://localhost:4000/api/sms/verify-otp', {
+      const result = await fetch('https://sungku1-q3j44yhv.b4a.run/api/sms/verify-otp', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

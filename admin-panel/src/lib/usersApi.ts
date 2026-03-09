@@ -1,4 +1,4 @@
-const API_BASE_URL = 'http://localhost:4000/api/admin';
+const API_BASE_URL = 'https://sungku1-q3j44yhv.b4a.run/api/admin';
 
 export interface User {
   userId: string;

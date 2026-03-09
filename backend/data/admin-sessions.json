@@ -83,5 +83,10 @@
     "email": "admin@sungku.app",
     "loginAt": "2026-03-09T15:12:14.438Z",
     "expiresAt": "2026-03-10T15:12:14.438Z"
+  },
+  "eyJhZG1pbklkIjoiYWRtaW5Ac3VuZ2t1LmFwcCIsImlhdCI6MTc3MzA4NTIxMTA3NiwiZXhwIjoxNzczMTcxNjExMDc2fQ==": {
+    "email": "admin@sungku.app",
+    "loginAt": "2026-03-09T19:40:11.267Z",
+    "expiresAt": "2026-03-10T19:40:11.267Z"
   }
 }

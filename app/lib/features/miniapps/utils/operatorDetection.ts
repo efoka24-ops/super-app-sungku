@@ -13,7 +13,7 @@ const OPERATORS: Record<Operator, OperatorConfig> = {
   orange: {
     code: 'orange',
     name: 'Orange Cameroun',
-    prefixes: ['65', '66', '67'],
+    prefixes: ['65', '69'],
     ussdCode: (phone: string, amount?: number) => {
       const amountPart = amount ? `*${amount}` : '';
       return `#150*1*1*1*${phone}${amountPart}#`;
@@ -23,7 +23,7 @@ const OPERATORS: Record<Operator, OperatorConfig> = {
   mtn: {
     code: 'mtn',
     name: 'MTN Cameroun',
-    prefixes: ['68', '69'],
+    prefixes: ['67', '68'],
     ussdCode: (phone: string, amount?: number) => {
       const amountPart = amount ? `*${amount}` : '';
       return `*126*1*1*${phone}${amountPart}#`;

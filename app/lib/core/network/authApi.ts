@@ -1,4 +1,4 @@
-const API_BASE = "http://localhost:4000/api";
+const API_BASE = import.meta.env.VITE_API_URL || "https://sungku1-q3j44yhv.b4a.run/api";
 
 interface SignupRequest {
   firstName: string;

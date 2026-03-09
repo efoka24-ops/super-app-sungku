@@ -23,7 +23,8 @@ export default function Messages() {
       const fetchConversations = async () => {
         try {
           const response = await fetch(
-            `http://localhost:4000/api/messages/${parsed.userId}`
+            `https://sungku-jazgwkbp.b4a.run/api/messages/${parsed.userId}`
+          `https://sungku1-q3j44yhv.b4a.run/api/messages/${parsed.userId}`
           );
           const data = await response.json();
           if (data.success) {
@@ -47,7 +48,8 @@ export default function Messages() {
     if (user) {
       try {
         const response = await fetch(
-          `http://localhost:4000/api/messages/${user.userId}/${conversationId}`
+          `https://sungku-jazgwkbp.b4a.run/api/messages/${user.userId}/${conversationId}`
+        `https://sungku1-q3j44yhv.b4a.run/api/messages/${user.userId}/${conversationId}`
         );
         const data = await response.json();
         if (data.success) {
@@ -64,7 +66,8 @@ export default function Messages() {
 
     try {
       const response = await fetch(
-        `http://localhost:4000/api/messages/${user.userId}/${selectedChat}/send`,
+        `https://sungku-jazgwkbp.b4a.run/api/messages/${user.userId}/${selectedChat}/send`,
+        `https://sungku1-q3j44yhv.b4a.run/api/messages/${user.userId}/${selectedChat}/send`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },

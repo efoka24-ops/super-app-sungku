@@ -60,7 +60,8 @@ export default function Payments() {
       const fetchTransactions = async () => {
         try {
           const response = await fetch(
-            `http://localhost:4000/api/profile/${parsed.userId}/stats`
+            `https://sungku-jazgwkbp.b4a.run/api/profile/${parsed.userId}/stats`
+          `https://sungku1-q3j44yhv.b4a.run/api/profile/${parsed.userId}/stats`
           );
           const data = await response.json();
           if (data.stats && data.stats.transactions) {

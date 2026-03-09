@@ -31,7 +31,7 @@ export default function AdminUsers() {
 
   const loadUsers = async () => {
     try {
-      const response = await fetch('http://localhost:4000/api/admin/users');
+      const response = await fetch('https://sungku1-q3j44yhv.b4a.run/api/admin/users');
       if (response.ok) {
         const data = await response.json();
         setUsers(data.users);
@@ -114,7 +114,7 @@ export default function AdminUsers() {
 
   const toggleUserStatus = async (userId: string, newStatus: User['status']) => {
     try {
-      await fetch(`http://localhost:4000/api/admin/users/${userId}/status`, {
+      await fetch(`https://sungku1-q3j44yhv.b4a.run/api/admin/users/${userId}/status`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: newStatus })

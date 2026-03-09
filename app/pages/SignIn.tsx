@@ -23,7 +23,7 @@ export default function SignIn() {
 
     try {
       // Fetch user from backend
-      const usersResponse = await fetch("http://localhost:4000/api/admin/users");
+      const usersResponse = await fetch("https://sungku1-q3j44yhv.b4a.run/api/admin/users");
       const usersData = await usersResponse.json();
 
       if (!usersData.success) {

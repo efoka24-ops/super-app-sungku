@@ -14,7 +14,8 @@ const twilioProvider: SmsProvider = {
   name: 'twilio',
   async sendOtp(phone: string, code: string): Promise<boolean> {
     try {
-      const response = await fetch('http://localhost:4000/api/sms/send-otp', {
+      const apiUrl = import.meta.env.VITE_API_URL || 'https://sungku1-q3j44yhv.b4a.run';
+      const response = await fetch(`${apiUrl}/api/sms/send-otp`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -32,8 +33,9 @@ const twilioProvider: SmsProvider = {
 
   async sendTransactionConfirm(phone: string, amount: number, recipient: string): Promise<boolean> {
     try {
+      const apiUrl = import.meta.env.VITE_API_URL || 'https://sungku1-q3j44yhv.b4a.run';
       const message = `Sungku: Vous avez envoyé ${amount.toLocaleString()} FCFA à ${recipient}. Ref: ${Date.now()}`;
-      const response = await fetch('http://localhost:4000/api/sms/send', {
+      const response = await fetch(`${apiUrl}/api/sms/send`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ phone, message })
@@ -50,7 +52,8 @@ const afrimotechProvider: SmsProvider = {
   name: 'afrimotech',
   async sendOtp(phone: string, code: string): Promise<boolean> {
     try {
-      const response = await fetch('http://localhost:4000/api/sms/send-otp', {
+      const apiUrl = import.meta.env.VITE_API_URL || 'https://sungku1-q3j44yhv.b4a.run';
+      const response = await fetch(`${apiUrl}/api/sms/send-otp`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -68,8 +71,9 @@ const afrimotechProvider: SmsProvider = {
 
   async sendTransactionConfirm(phone: string, amount: number, recipient: string): Promise<boolean> {
     try {
+      const apiUrl = import.meta.env.VITE_API_URL || 'https://sungku1-q3j44yhv.b4a.run';
       const message = `Sungku: ${amount.toLocaleString()} FCFA envoyés à ${recipient}`;
-      const response = await fetch('http://localhost:4000/api/sms/send', {
+      const response = await fetch(`${apiUrl}/api/sms/send`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ phone, message, provider: 'afrimotech' })

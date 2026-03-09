@@ -74,7 +74,7 @@ export default function ProfileInfo() {
     // Save avatar to backend if it exists
     if (avatar && user) {
       try {
-        await fetch(`http://localhost:4000/api/profile/${user.userId}/avatar`, {
+        await fetch(`https://sungku1-q3j44yhv.b4a.run/api/profile/${user.userId}/avatar`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ avatar }),

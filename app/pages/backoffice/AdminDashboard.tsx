@@ -30,7 +30,7 @@ export default function AdminDashboard() {
   const loadDashboardStats = async () => {
     try {
       // Simulate API call - replace with actual backend endpoint
-      const response = await fetch('http://localhost:4000/api/admin/dashboard-stats');
+      const response = await fetch('https://sungku1-q3j44yhv.b4a.run/api/admin/dashboard-stats');
       if (response.ok) {
         const data = await response.json();
         setStats(data);

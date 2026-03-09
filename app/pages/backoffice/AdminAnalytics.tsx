@@ -27,7 +27,7 @@ export default function AdminAnalytics() {
 
   const loadAnalytics = async () => {
     try {
-      const response = await fetch(`http://localhost:4000/api/admin/analytics?period=${period}`);
+      const response = await fetch(`https://sungku1-q3j44yhv.b4a.run/api/admin/analytics?period=${period}`);
       if (response.ok) {
         const data = await response.json();
         setAnalytics(data);
