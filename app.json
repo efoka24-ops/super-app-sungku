@@ -1,0 +1,22 @@
+{
+  "name": "Sungku Super App Backend",
+  "description": "Backend API for Sungku Super App mobile",
+  "keywords": ["node", "express", "api", "mobile"],
+  "repository": "https://github.com/efoka24-ops/super-app-sungku",
+  "engines": {
+    "node": "18.x"
+  },
+  "scripts": {
+    "start": "node backend/server.js"
+  },
+  "env": {
+    "PORT": {
+      "description": "Port for backend",
+      "value": "4000"
+    },
+    "NODE_ENV": {
+      "description": "Environment",
+      "value": "production"
+    }
+  }
+}

@@ -16,7 +16,7 @@ import smsRoutes from "./routes/sms.js";
 import messagesRoutes from "./routes/messages.js";
 
 const app = express();
-const PORT = Number(process.env.BACKEND_PORT || 4000);
+const PORT = Number(process.env.PORT || process.env.BACKEND_PORT || 4000);
 
 app.use(cors());
 app.use(express.json());

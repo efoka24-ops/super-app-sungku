@@ -1,0 +1,14 @@
+node_modules
+npm-debug.log
+.git
+.gitignore
+README.md
+dist
+android
+app
+admin-panel
+styles
+imports
+*.md
+.env
+.env.local
