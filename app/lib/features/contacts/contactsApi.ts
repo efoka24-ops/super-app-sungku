@@ -1,4 +1,6 @@
-const API_BASE = "http://localhost:4000/api";
+import API_CONFIG from "../../config";
+
+const API_BASE = `${API_CONFIG.BACKEND_URL.replace(/\/$/, "")}/api`;
 
 export interface Contact {
   id: string;

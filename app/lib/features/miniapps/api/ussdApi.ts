@@ -1,3 +1,7 @@
+import API_CONFIG from "../../../config";
+
+const API_BASE = `${API_CONFIG.BACKEND_URL.replace(/\/$/, "")}/api/ussd`;
+
 interface USSDRequest {
   phoneNumber: string;
   operator: string;
@@ -32,7 +36,7 @@ export async function initiateUSSD(
       description
     };
 
-    const response = await fetch('http://localhost:4000/api/ussd/initiate', {
+    const response = await fetch(`${API_BASE}/initiate`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -61,7 +65,7 @@ export async function getUSSDHistory(
 ): Promise<USSDResponse[]> {
   try {
     const response = await fetch(
-      `http://localhost:4000/api/ussd/history/${userId}?limit=${limit}`,
+      `${API_BASE}/history/${userId}?limit=${limit}`,
       {
         headers: {
           'Content-Type': 'application/json'
@@ -88,7 +92,7 @@ export async function checkUSSDStatus(
 ): Promise<USSDResponse> {
   try {
     const response = await fetch(
-      `http://localhost:4000/api/ussd/status/${transactionId}`,
+      `${API_BASE}/status/${transactionId}`,
       {
         headers: {
           'Content-Type': 'application/json'
@@ -113,7 +117,7 @@ export async function checkUSSDStatus(
 export async function cancelUSSD(transactionId: string): Promise<{ success: boolean }> {
   try {
     const response = await fetch(
-      `http://localhost:4000/api/ussd/cancel/${transactionId}`,
+      `${API_BASE}/cancel/${transactionId}`,
       {
         method: 'POST'
       }

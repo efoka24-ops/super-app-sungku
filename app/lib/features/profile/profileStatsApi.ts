@@ -1,4 +1,5 @@
 import { httpClient } from "../../core/network/httpClient";
+import API_CONFIG from "../../config";
 
 type ProfileStats = {
   transfers: number;
@@ -12,7 +13,7 @@ type ProfileStatsResponse = {
   stats: ProfileStats;
 };
 
-const PROFILE_API_BASE = "http://localhost:4000";
+const PROFILE_API_BASE = API_CONFIG.BACKEND_URL.replace(/\/$/, "");
 
 export async function fetchProfileStats(userId: string, miniApps: number): Promise<ProfileStats> {
   const response = await httpClient<ProfileStatsResponse>(

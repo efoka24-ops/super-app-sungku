@@ -1,16 +1,15 @@
 import express from 'express';
+import db from '../lib/db.js';
 import { readCollection, writeCollection, nowIso } from '../lib/store.js';
 
 const router = express.Router();
-
-// Store OTPs temporarily (in-memory, replace with Redis in production)
 const otpStore = new Map();
 
 /**
  * POST /api/sms/send-otp
  * Envoyer un code OTP par SMS
  */
-router.post('/send-otp', (req, res) => {
+router.post('/send-otp', async (req, res) => {
   const { phone, code, provider = 'afrimotech' } = req.body;
 
   if (!phone || !code) {
@@ -34,15 +33,13 @@ router.post('/send-otp', (req, res) => {
     console.log(`📱 [${provider.toUpperCase()}] OTP envoyé à ${phone}: ${code}`);
 
     // Log SMS for debugging
+    const logEntry = { id: Date.now().toString(), phone, code, provider, type: 'otp', status: 'sent', created_at: nowIso() };
+    if (db) {
+      const { error } = await db.from('sms_logs').insert(logEntry);
+      if (error) console.error('Supabase sms send log:', error.message);
+    }
     const logs = readCollection('sms-logs.json', []);
-    logs.push({
-      id: Date.now().toString(),
-      phone,
-      code,
-      provider,
-      status: 'sent',
-      timestamp: nowIso()
-    });
+    logs.push({ ...logEntry, timestamp: logEntry.created_at });
     writeCollection('sms-logs.json', logs);
 
     res.json({
@@ -64,7 +61,7 @@ router.post('/send-otp', (req, res) => {
  * POST /api/sms/verify-otp
  * Vérifier un code OTP
  */
-router.post('/verify-otp', (req, res) => {
+router.post('/verify-otp', async (req, res) => {
   const { phone, code } = req.body;
 
   if (!phone || !code) {
@@ -115,14 +112,13 @@ router.post('/verify-otp', (req, res) => {
     otpStore.delete(phone);
 
     // Log success
+    const logEntry = { id: Date.now().toString(), phone, code, type: 'otp', status: 'verified', created_at: nowIso() };
+    if (db) {
+      const { error } = await db.from('sms_logs').insert(logEntry);
+      if (error) console.error('Supabase sms verify log:', error.message);
+    }
     const logs = readCollection('sms-logs.json', []);
-    logs.push({
-      id: Date.now().toString(),
-      phone,
-      code,
-      status: 'verified',
-      timestamp: nowIso()
-    });
+    logs.push({ ...logEntry, timestamp: logEntry.created_at });
     writeCollection('sms-logs.json', logs);
 
     res.json({

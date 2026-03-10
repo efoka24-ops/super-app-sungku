@@ -1,7 +1,9 @@
+import "dotenv/config";
 import express from "express";
 import cors from "cors";
 import { readCollection, writeCollection, nowIso } from "./lib/store.js";
 import { defaultStats } from "./lib/defaults.js";
+import { isSupabaseConfigured } from "./lib/supabase.js";
 
 import authRoutes from "./routes/auth.js";
 import profileRoutes from "./routes/profile.js";
@@ -23,7 +25,12 @@ app.use(express.json({ limit: '10mb' })); // Increased limit for avatar uploads
 app.use(express.urlencoded({ limit: '10mb', extended: true }));
 
 app.get("/api/health", (_req, res) => {
-  res.json({ ok: true, service: "sungku-backend", timestamp: new Date().toISOString() });
+  res.json({
+    ok: true,
+    service: "sungku-backend",
+    timestamp: new Date().toISOString(),
+    supabaseConfigured: isSupabaseConfigured,
+  });
 });
 
 app.use("/api/auth", authRoutes);
@@ -82,6 +89,10 @@ app.use((_req, res) => {
   res.status(404).json({ message: "Route not found" });
 });
 
-app.listen(PORT, () => {
-  console.log(`Sungku backend API running on http://localhost:${PORT}`);
-});
+export default app;
+
+if (!process.env.VERCEL) {
+  app.listen(PORT, () => {
+    console.log(`Sungku backend API running on http://localhost:${PORT}`);
+  });
+}

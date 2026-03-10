@@ -1,8 +1,9 @@
 const rawApiUrl =
-  (import.meta.env.VITE_API_URL as string | undefined) ||
-  (import.meta.env.PROD ? "https://super-app-sungku.onrender.com" : "http://localhost:4000");
+  import.meta.env.DEV
+    ? "/api"
+    : (import.meta.env.VITE_API_URL as string | undefined) || "https://super-app-sungku.onrender.com";
 const normalizedBase = rawApiUrl.replace(/\/$/, "");
-const API_BASE = normalizedBase.endsWith('/api') ? normalizedBase : `${normalizedBase}/api`;
+const API_BASE = normalizedBase.endsWith("/api") ? normalizedBase : `${normalizedBase}/api`;
 
 interface SignupRequest {
   firstName: string;
@@ -48,7 +49,7 @@ export async function signup(data: SignupRequest): Promise<SignupResponse> {
     return await response.json();
   } catch (error) {
     console.error("Signup error:", error);
-    throw new Error("Connexion backend impossible (URL/CORS/réseau)");
+    throw new Error(`Connexion backend impossible (${API_BASE}/auth/signup)`);
   }
 }
 

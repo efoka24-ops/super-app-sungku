@@ -1,4 +1,5 @@
 import express from "express";
+import db from "../lib/db.js";
 import { readCollection, writeCollection, nowIso } from "../lib/store.js";
 
 const router = express.Router();
@@ -61,102 +62,64 @@ router.post("/login", (req, res) => {
 });
 
 // Get dashboard stats (REAL DATA)
-router.get("/dashboard-stats", (req, res) => {
-  const users = readCollection("users.json", {});
-  const profileStats = readCollection("profile-stats.json", {});
-  const ussdTransactions = readCollection("ussd-transactions.json", {});
-  const miniApps = readCollection("miniapps-catalog.json", []);
+router.get("/dashboard-stats", async (req, res) => {
+  let usersList = [];
+  if (db) {
+    const { data: rows } = await db.from("users").select("user_id,verified,created_at");
+    if (rows) usersList = rows.map(r => ({ userId: r.user_id, verified: r.verified, createdAt: r.created_at }));
+  }
+  if (!usersList.length) {
+    const users = readCollection("users.json", {});
+    usersList = Object.values(users);
+  }
 
-  // Count real users
-  const usersList = Array.isArray(users) ? users : Object.values(users);
-  const totalUsers = usersList.length;
-  const activeUsers = usersList.filter(u => u.verified).length;
+  let transactionsList = [];
+  if (db) {
+    const { data: rows } = await db.from("ussd_transactions").select("*");
+    if (rows) transactionsList = rows.map(r => ({ status: r.status, amount: r.amount, completedAt: r.completed_at }));
+  }
+  if (!transactionsList.length) {
+    transactionsList = Object.values(readCollection("ussd-transactions.json", {}));
+  }
 
-  // Count real transactions
-  const transactionsList = Object.values(ussdTransactions || {});
-  const totalTransactions = transactionsList.length;
+  const totalUsers          = usersList.length;
+  const activeUsers         = usersList.filter(u => u.verified).length;
+  const totalTransactions   = transactionsList.length;
   const completedTransactions = transactionsList.filter(t => t.status === "completed");
-  
-  // Calculate total revenue (amount of completed transactions)
-  const totalRevenue = completedTransactions.reduce((sum, t) => sum + (t.amount || 0), 0);
+  const totalRevenue        = completedTransactions.reduce((s, t) => s + (Number(t.amount) || 0), 0);
+  const miniApps            = readCollection("miniapps-catalog.json", []);
 
-  // Recent activity from all transactions
-  const recentActivity = transactionsList
-    .filter(t => t.status === "completed")
-    .sort((a, b) => new Date(b.completedAt) - new Date(a.completedAt))
-    .slice(0, 5)
-    .map(t => {
-      const user = usersList.find(u => u.userId === t.userId);
-      return {
-        id: t.transactionId,
-        user: user ? `${user.firstName} ${user.lastName}` : "Anonyme",
-        action: `Envoi de ${(t.amount / 1000).toFixed(1)}K FCFA`,
-        timestamp: t.completedAt
-      };
-    });
-
-  // Add user signups to activity
-  usersList
+  const recentActivity = usersList
     .filter(u => u.createdAt)
     .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-    .slice(0, 5)
-    .forEach(u => {
-      recentActivity.push({
-        id: `user-${u.userId}`,
-        user: `${u.firstName} ${u.lastName}`,
-        action: "Inscription",
-        timestamp: u.createdAt
-      });
-    });
+    .slice(0, 10)
+    .map(u => ({ id: `user-${u.userId}`, user: `${u.firstName || u.first_name || ""} ${u.lastName || u.last_name || ""}`.trim() || u.userId, action: "Inscription", timestamp: u.createdAt }));
 
-  // Sort all activity by timestamp descending and take 10
-  const allActivity = recentActivity.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)).slice(0, 10);
-
-  res.json({
-    success: true,
-    totalUsers,
-    activeUsers,
-    totalTransactions,
-    totalRevenue,
-    miniAppsCount: miniApps.length,
-    recentActivity: allActivity
-  });
+  res.json({ success: true, totalUsers, activeUsers, totalTransactions, totalRevenue, miniAppsCount: miniApps.length, recentActivity });
 });
 
 // Get users with search/filter
-router.get("/users", (req, res) => {
+router.get("/users", async (req, res) => {
   const { search, status, limit = 100, offset = 0 } = req.query;
+  let allUsers = [];
 
-  const usersData = readCollection("users.json", {});
-  
-  // Convert object to array if needed
-  let allUsers = Array.isArray(usersData) ? usersData : Object.values(usersData);
-  
+  if (db) {
+    const { data } = await db.from("users").select("*").order("created_at", { ascending: false });
+    if (data) allUsers = data.map(r => ({ userId: r.user_id, firstName: r.first_name, lastName: r.last_name, phone: r.phone, email: r.email, verified: r.verified, language: r.language, avatar: r.avatar, createdAt: r.created_at }));
+  }
+  if (!allUsers.length) {
+    const usersData = readCollection("users.json", {});
+    allUsers = Object.values(usersData);
+  }
+
   let filtered = allUsers;
-  
   if (search) {
     const s = search.toLowerCase();
-    filtered = allUsers.filter(u =>
-      (u.firstName?.toLowerCase() || '').includes(s) ||
-      (u.lastName?.toLowerCase() || '').includes(s) ||
-      (u.email?.toLowerCase() || '').includes(s) ||
-      (u.phone || '').includes(search)
-    );
+    filtered = allUsers.filter(u => (u.firstName?.toLowerCase()||'').includes(s) || (u.lastName?.toLowerCase()||'').includes(s) || (u.email?.toLowerCase()||'').includes(s) || (u.phone||'').includes(search));
   }
+  if (status && status !== "all") filtered = filtered.filter(u => u.status === status);
 
-  if (status && status !== "all") {
-    filtered = filtered.filter(u => u.status === status);
-  }
-
-  const paginated = filtered.slice(Number(offset), Number(offset) + Number(limit));
-
-  res.json({
-    success: true,
-    users: paginated,
-    total: filtered.length,
-    limit: Number(limit),
-    offset: Number(offset)
-  });
+  res.json({ success: true, users: filtered.slice(Number(offset), Number(offset)+Number(limit)), total: filtered.length, limit: Number(limit), offset: Number(offset) });
 });
 
 // Update user status

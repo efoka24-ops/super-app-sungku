@@ -1,259 +1,108 @@
 import express from "express";
+import db from "../lib/db.js";
 import { readCollection, writeCollection, nowIso } from "../lib/store.js";
 
 const router = express.Router();
 
-// Helper to generate USSD code
 function generateUSSDCode(operator, phoneNumber, amount) {
-  if (operator === "orange") {
-    return `#150*1*1*1*${phoneNumber}*${amount}#`;
-  } else if (operator === "mtn") {
-    return `*126*1*1*${phoneNumber}*${amount}#`;
-  }
+  if (operator === "orange") return `#150*1*1*1*${phoneNumber}*${amount}#`;
+  if (operator === "mtn")    return `*126*1*1*${phoneNumber}*${amount}#`;
   return "";
 }
+function generateTransactionId() { return `TXN_${Date.now()}`; }
 
-// Helper to generate transaction ID
-function generateTransactionId() {
-  return `TXN_${Date.now()}`;
-}
-
-// Initiate USSD transaction
-router.post("/initiate", (req, res) => {
+router.post("/initiate", async (req, res) => {
   const { phoneNumber, operator, amount, description, userId } = req.body;
-
-  // Validation
-  if (!phoneNumber || !operator || !amount) {
-    return res.status(400).json({
-      success: false,
-      message: "phoneNumber, operator, and amount are required"
-    });
-  }
-
-  if (!["orange", "mtn"].includes(operator)) {
-    return res.status(400).json({
-      success: false,
-      message: "Invalid operator. Use 'orange' or 'mtn'"
-    });
-  }
-
-  if (amount < 1000 || amount > 1000000) {
-    return res.status(400).json({
-      success: false,
-      message: "Amount must be between 1,000 and 1,000,000 FCFA"
-    });
-  }
+  if (!phoneNumber || !operator || !amount) return res.status(400).json({ success: false, message: "phoneNumber, operator, and amount are required" });
+  if (!["orange", "mtn"].includes(operator)) return res.status(400).json({ success: false, message: "Invalid operator. Use 'orange' or 'mtn'" });
+  if (amount < 1000 || amount > 1000000) return res.status(400).json({ success: false, message: "Amount must be between 1,000 and 1,000,000 FCFA" });
 
   const transactionId = generateTransactionId();
-  const ussdCode = generateUSSDCode(operator, phoneNumber, amount);
+  const code          = generateUSSDCode(operator, phoneNumber, amount);
+  const now           = nowIso();
+  const expiresAt     = new Date(Date.now() + 5 * 60 * 1000).toISOString();
+  const txn = { transactionId, phoneNumber, operator, amount, description: description || "payment", userId: userId || "anonymous", code, status: "pending", initiatedAt: now, expiresAt, completedAt: null };
 
-  // Store transaction
-  const ussdStore = readCollection("ussd-transactions.json", {});
-  ussdStore[transactionId] = {
-    transactionId,
-    phoneNumber,
-    operator,
-    amount,
-    description: description || "payment",
-    userId: userId || "anonymous",
-    code: ussdCode,
-    status: "pending",
-    initiatedAt: nowIso(),
-    expiresAt: new Date(Date.now() + 5 * 60 * 1000).toISOString(), // 5 min expiry
-    completedAt: null
-  };
-  writeCollection("ussd-transactions.json", ussdStore);
+  if (db) await db.from("ussd_transactions").insert({ transaction_id: transactionId, phone_number: phoneNumber, operator, amount, description: txn.description, user_id: txn.userId, code, status: "pending", initiated_at: now, expires_at: expiresAt }).catch(e => console.error("Supabase ussd:", e.message));
+  const store = readCollection("ussd-transactions.json", {});
+  store[transactionId] = txn;
+  writeCollection("ussd-transactions.json", store);
 
-  res.json({
-    success: true,
-    transactionId,
-    message: "USSD initié",
-    operator,
-    phoneNumber,
-    amount,
-    code: ussdCode,
-    timestamp: nowIso()
-  });
+  res.json({ success: true, transactionId, message: "USSD initié", operator, phoneNumber, amount, code, timestamp: now });
 });
 
-// Check USSD transaction status
-router.get("/status/:transactionId", (req, res) => {
+router.get("/status/:transactionId", async (req, res) => {
   const { transactionId } = req.params;
-
-  const ussdStore = readCollection("ussd-transactions.json", {});
-  const transaction = ussdStore[transactionId];
-
-  if (!transaction) {
-    return res.status(404).json({
-      success: false,
-      message: "Transaction not found"
-    });
+  let txn;
+  if (db) {
+    const { data } = await db.from("ussd_transactions").select("*").eq("transaction_id", transactionId).maybeSingle();
+    if (data) txn = { status: data.status, operator: data.operator, phoneNumber: data.phone_number, amount: data.amount, completedAt: data.completed_at, initiatedAt: data.initiated_at };
   }
-
-  res.json({
-    success: true,
-    transactionId,
-    status: transaction.status,
-    message: transaction.status === "completed" 
-      ? "Transaction réussie" 
-      : transaction.status === "failed"
-      ? "Transaction échouée"
-      : "En attente de confirmation",
-    operator: transaction.operator,
-    phoneNumber: transaction.phoneNumber,
-    amount: transaction.amount,
-    timestamp: transaction.completedAt || transaction.initiatedAt
-  });
+  if (!txn) {
+    const store = readCollection("ussd-transactions.json", {});
+    txn = store[transactionId];
+  }
+  if (!txn) return res.status(404).json({ success: false, message: "Transaction not found" });
+  res.json({ success: true, transactionId, status: txn.status, operator: txn.operator, phoneNumber: txn.phoneNumber, amount: txn.amount, timestamp: txn.completedAt || txn.initiatedAt });
 });
 
-// Get USSD history for a user
-router.get("/history/:userId", (req, res) => {
+router.get("/history/:userId", async (req, res) => {
   const { userId } = req.params;
   const { limit = 10, offset = 0 } = req.query;
-
-  const ussdStore = readCollection("ussd-transactions.json", {});
-  const userTransactions = Object.values(ussdStore)
-    .filter(t => t.userId === userId || userId === "all")
-    .sort((a, b) => new Date(b.initiatedAt) - new Date(a.initiatedAt))
-    .slice(Number(offset), Number(offset) + Number(limit));
-
-  res.json({
-    success: true,
-    transactions: userTransactions,
-    total: Object.values(ussdStore).filter(t => t.userId === userId).length,
-    limit: Number(limit),
-    offset: Number(offset)
-  });
+  if (db) {
+    const { data } = await db.from("ussd_transactions").select("*").eq("user_id", userId).order("initiated_at", { ascending: false }).range(Number(offset), Number(offset) + Number(limit) - 1);
+    if (data) return res.json({ success: true, transactions: data, total: data.length, limit: Number(limit), offset: Number(offset) });
+  }
+  const store = readCollection("ussd-transactions.json", {});
+  const txns  = Object.values(store).filter(t => t.userId === userId).sort((a,b) => new Date(b.initiatedAt)-new Date(a.initiatedAt)).slice(Number(offset), Number(offset)+Number(limit));
+  res.json({ success: true, transactions: txns, total: txns.length, limit: Number(limit), offset: Number(offset) });
 });
 
-// Cancel USSD transaction
-router.post("/cancel/:transactionId", (req, res) => {
+router.post("/cancel/:transactionId", async (req, res) => {
   const { transactionId } = req.params;
-
-  const ussdStore = readCollection("ussd-transactions.json", {});
-  const transaction = ussdStore[transactionId];
-
-  if (!transaction) {
-    return res.status(404).json({
-      success: false,
-      message: "Transaction not found"
-    });
-  }
-
-  if (transaction.status !== "pending") {
-    return res.status(400).json({
-      success: false,
-      message: "Can only cancel pending transactions"
-    });
-  }
-
-  transaction.status = "cancelled";
-  transaction.completedAt = nowIso();
-  writeCollection("ussd-transactions.json", ussdStore);
-
-  res.json({
-    success: true,
-    message: "Transaction annulée",
-    transactionId
-  });
+  const now = nowIso();
+  if (db) await db.from("ussd_transactions").update({ status: "cancelled", completed_at: now }).eq("transaction_id", transactionId).catch(() => {});
+  const store = readCollection("ussd-transactions.json", {});
+  if (!store[transactionId]) return res.status(404).json({ success: false, message: "Transaction not found" });
+  if (store[transactionId].status !== "pending") return res.status(400).json({ success: false, message: "Can only cancel pending transactions" });
+  store[transactionId].status = "cancelled";
+  store[transactionId].completedAt = now;
+  writeCollection("ussd-transactions.json", store);
+  res.json({ success: true, message: "Transaction annulée", transactionId });
 });
 
-// Simulate successful USSD response (for testing)
-router.post("/simulate-success/:transactionId", (req, res) => {
+router.post("/simulate-success/:transactionId", async (req, res) => {
   const { transactionId } = req.params;
   const { userId } = req.body;
-
-  const ussdStore = readCollection("ussd-transactions.json", {});
-  const transaction = ussdStore[transactionId];
-
-  if (!transaction) {
-    return res.status(404).json({
-      success: false,
-      message: "Transaction not found"
-    });
+  const now = nowIso();
+  if (db) await db.from("ussd_transactions").update({ status: "completed", completed_at: now }).eq("transaction_id", transactionId).catch(() => {});
+  const store = readCollection("ussd-transactions.json", {});
+  const txn   = store[transactionId];
+  if (!txn) return res.status(404).json({ success: false, message: "Transaction not found" });
+  txn.status = "completed"; txn.completedAt = now;
+  writeCollection("ussd-transactions.json", store);
+  const uid = userId || txn.userId;
+  if (uid) {
+    const stats = readCollection("profile-stats.json", {});
+    if (!stats[uid]) stats[uid] = { userId: uid, transfers: 0, contacts: 0, miniApps: 0, balance: 0 };
+    stats[uid].transfers = (stats[uid].transfers || 0) + 1;
+    stats[uid].updatedAt = now;
+    writeCollection("profile-stats.json", stats);
+    if (db) await db.from("profile_stats").upsert({ user_id: uid, transfers: stats[uid].transfers, updated_at: now }, { onConflict: "user_id" }).catch(() => {});
   }
-
-  transaction.status = "completed";
-  transaction.completedAt = nowIso();
-  writeCollection("ussd-transactions.json", ussdStore);
-
-  // Update user profile stats if userId provided
-  if (userId || transaction.userId) {
-    const uid = userId || transaction.userId;
-    const statsStore = readCollection("profile-stats.json", {});
-    
-    if (!statsStore[uid]) {
-      statsStore[uid] = {
-        userId: uid,
-        transfers: 0,
-        contacts: 0,
-        miniApps: 1,
-        balance: 0,
-        transactions: []
-      };
-    }
-
-    // Add to transfers count
-    statsStore[uid].transfers = (statsStore[uid].transfers || 0) + 1;
-    
-    // Add to transactions array
-    if (!statsStore[uid].transactions) {
-      statsStore[uid].transactions = [];
-    }
-    
-    statsStore[uid].transactions.push({
-      id: transactionId,
-      type: "transfer",
-      amount: transaction.amount,
-      recipient: transaction.phoneNumber,
-      operator: transaction.operator,
-      status: "completed",
-      timestamp: transaction.completedAt
-    });
-
-    // Limit transactions to last 50
-    if (statsStore[uid].transactions.length > 50) {
-      statsStore[uid].transactions = statsStore[uid].transactions.slice(-50);
-    }
-
-    statsStore[uid].updatedAt = nowIso();
-    writeCollection("profile-stats.json", statsStore);
-  }
-
-  res.json({
-    success: true,
-    message: "Transaction simulée complète",
-    transactionId,
-    status: "completed"
-  });
+  res.json({ success: true, message: "Transaction simulée complète", transactionId, status: "completed" });
 });
 
-// Simulate failed USSD response (for testing)
-router.post("/simulate-failure/:transactionId", (req, res) => {
+router.post("/simulate-failure/:transactionId", async (req, res) => {
   const { transactionId } = req.params;
   const { reason = "Solde insuffisant" } = req.body;
-
-  const ussdStore = readCollection("ussd-transactions.json", {});
-  const transaction = ussdStore[transactionId];
-
-  if (!transaction) {
-    return res.status(404).json({
-      success: false,
-      message: "Transaction not found"
-    });
-  }
-
-  transaction.status = "failed";
-  transaction.failureReason = reason;
-  transaction.completedAt = nowIso();
-  writeCollection("ussd-transactions.json", ussdStore);
-
-  res.json({
-    success: false,
-    message: reason,
-    transactionId,
-    status: "failed"
-  });
+  const now = nowIso();
+  if (db) await db.from("ussd_transactions").update({ status: "failed", failure_reason: reason, completed_at: now }).eq("transaction_id", transactionId).catch(() => {});
+  const store = readCollection("ussd-transactions.json", {});
+  if (!store[transactionId]) return res.status(404).json({ success: false, message: "Transaction not found" });
+  store[transactionId].status = "failed"; store[transactionId].failureReason = reason; store[transactionId].completedAt = now;
+  writeCollection("ussd-transactions.json", store);
+  res.json({ success: false, message: reason, transactionId, status: "failed" });
 });
 
 export default router;
