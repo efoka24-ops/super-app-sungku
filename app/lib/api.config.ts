@@ -5,7 +5,7 @@
 
 export const API_CONFIG = {
   // Production - Use environment variable with online fallback
-  PRODUCTION: import.meta.env.VITE_API_URL || 'https://sungku1-q3j44yhv.b4a.run',
+  PRODUCTION: import.meta.env.VITE_API_URL || 'https://super-app-sungku.onrender.com',
   
   // Development - Local
   DEVELOPMENT: 'http://localhost:4000',

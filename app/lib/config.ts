@@ -7,7 +7,7 @@ export const API_CONFIG = {
   // Use explicit env var, otherwise fallback by environment
   BACKEND_URL:
     import.meta.env.VITE_API_URL ||
-    (import.meta.env.PROD ? 'https://sungku1-q3j44yhv.b4a.run' : 'http://localhost:4000'),
+    (import.meta.env.PROD ? 'https://super-app-sungku.onrender.com' : 'http://localhost:4000'),
 };
 
 // Build full API endpoint
