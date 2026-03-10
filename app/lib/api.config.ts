@@ -4,9 +4,12 @@
  */
 
 export const API_CONFIG = {
-  // Production - Back4App
-  PRODUCTION: import.meta.env.VITE_BACK4APP_URL || 'https://parseapi.back4app.com',
-  
+  // Production - Render (keeps legacy env var compatibility)
+  PRODUCTION:
+    import.meta.env.VITE_API_URL ||
+    import.meta.env.VITE_BACK4APP_URL ||
+    'https://super-app-sungku.onrender.com',
+
   // Development - Local
   DEVELOPMENT: 'http://localhost:4000',
   
