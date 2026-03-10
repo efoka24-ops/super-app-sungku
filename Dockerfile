@@ -1,16 +1,15 @@
-FROM node:18-alpine
+FROM node:20-alpine
 
 WORKDIR /app
 
-# Copier les fichiers
-COPY package*.json ./
-COPY backend/ ./backend/
+# Install backend dependencies only (faster and more reliable in CI)
+COPY backend/package.json ./package.json
+RUN npm install --omit=dev --no-audit --no-fund
 
-# Installer les dépendances
-RUN npm install --production
+# Copy backend source
+COPY backend/ ./
 
-# Port
-EXPOSE 4000
+# Back4App/containers usually inject PORT (often 8080)
+EXPOSE 8080
 
-# Start
-CMD ["node", "backend/server.js"]
+CMD ["node", "server.js"]
