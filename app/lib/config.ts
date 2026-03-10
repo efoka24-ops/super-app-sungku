@@ -4,11 +4,10 @@
  */
 
 export const API_CONFIG = {
-  // Back4App Backend URL
-    BACKEND_URL: 'https://sungku1-q3j44yhv.b4a.run',
-  
-  // Alternative: Use environment variable if available
-    // BACKEND_URL: import.meta.env.VITE_API_URL || 'https://sungku1-q3j44yhv.b4a.run',
+  // Use explicit env var, otherwise fallback by environment
+  BACKEND_URL:
+    import.meta.env.VITE_API_URL ||
+    (import.meta.env.PROD ? 'https://sungku1-q3j44yhv.b4a.run' : 'http://localhost:4000'),
 };
 
 // Build full API endpoint

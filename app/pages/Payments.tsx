@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { Button } from "../components/ui/button";
 import { useState, useEffect } from "react";
+import { buildApiUrl, API_ENDPOINTS } from "../lib/config";
 
 const paymentActions = [
   {
@@ -60,8 +61,7 @@ export default function Payments() {
       const fetchTransactions = async () => {
         try {
           const response = await fetch(
-            `https://sungku-jazgwkbp.b4a.run/api/profile/${parsed.userId}/stats`
-          `https://sungku1-q3j44yhv.b4a.run/api/profile/${parsed.userId}/stats`
+            buildApiUrl(API_ENDPOINTS.STATS(parsed.userId))
           );
           const data = await response.json();
           if (data.stats && data.stats.transactions) {

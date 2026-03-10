@@ -1,4 +1,4 @@
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'https://sungku1-q3j44yhv.b4a.run/api/admin';
+import { ADMIN_API_BASE_URL } from './apiBase';
 
 export interface MiniApp {
   id: string;
@@ -17,7 +17,7 @@ export interface MiniApp {
 // Get mini-apps catalog
 export async function getMiniAppsCatalog(): Promise<MiniApp[]> {
   try {
-    const response = await fetch(`${API_BASE_URL}/miniapps-catalog`);
+    const response = await fetch(`${ADMIN_API_BASE_URL}/miniapps-catalog`);
     if (!response.ok) throw new Error('Failed to fetch catalog');
     const data = await response.json();
     return data.miniApps || [];
@@ -55,7 +55,7 @@ export async function createMiniApp(miniApp: Omit<MiniApp, 'id' | 'installations
 // Update mini-app publish status
 export async function togglePublishStatus(appId: string, published: boolean): Promise<MiniApp | null> {
   try {
-    const response = await fetch(`${API_BASE_URL}/miniapps/${appId}/publish`, {
+    const response = await fetch(`${ADMIN_API_BASE_URL}/miniapps/${appId}/publish`, {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json'
@@ -75,7 +75,7 @@ export async function togglePublishStatus(appId: string, published: boolean): Pr
 // Update mini-app featured status
 export async function toggleFeaturedStatus(appId: string, featured: boolean): Promise<MiniApp | null> {
   try {
-    const response = await fetch(`${API_BASE_URL}/miniapps/${appId}/featured`, {
+    const response = await fetch(`${ADMIN_API_BASE_URL}/miniapps/${appId}/featured`, {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json'
@@ -95,7 +95,7 @@ export async function toggleFeaturedStatus(appId: string, featured: boolean): Pr
 // Delete mini-app
 export async function deleteMiniApp(appId: string): Promise<boolean> {
   try {
-    const response = await fetch(`${API_BASE_URL}/miniapps/${appId}`, {
+    const response = await fetch(`${ADMIN_API_BASE_URL}/miniapps/${appId}`, {
       method: 'DELETE'
     });
 

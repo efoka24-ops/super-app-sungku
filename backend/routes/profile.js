@@ -53,6 +53,19 @@ router.get("/:userId/stats", (req, res) => {
   if (!statsStore[userId]) {
     statsStore[userId] = defaultStats(userId, miniAppsCount);
     writeCollection("profile-stats.json", statsStore);
+  } else {
+    const current = statsStore[userId];
+    const isLegacyShape =
+      !current ||
+      typeof current !== "object" ||
+      current.userId !== userId ||
+      !Array.isArray(current.transactions) ||
+      typeof current.balance !== "number";
+
+    if (isLegacyShape) {
+      statsStore[userId] = defaultStats(userId, miniAppsCount);
+      writeCollection("profile-stats.json", statsStore);
+    }
   }
 
   return res.json({ userId, stats: statsStore[userId] });

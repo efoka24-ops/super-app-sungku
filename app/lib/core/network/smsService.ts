@@ -9,13 +9,16 @@ interface SmsProvider {
   sendTransactionConfirm(phone: string, amount: number, recipient: string): Promise<boolean>;
 }
 
+const API_URL =
+  import.meta.env.VITE_API_URL ||
+  (import.meta.env.PROD ? 'https://sungku1-q3j44yhv.b4a.run' : 'http://localhost:4000');
+
 // Provider: Twilio (à configurer avec variables d'environnement)
 const twilioProvider: SmsProvider = {
   name: 'twilio',
   async sendOtp(phone: string, code: string): Promise<boolean> {
     try {
-      const apiUrl = import.meta.env.VITE_API_URL || 'https://sungku1-q3j44yhv.b4a.run';
-      const response = await fetch(`${apiUrl}/api/sms/send-otp`, {
+      const response = await fetch(`${API_URL}/api/sms/send-otp`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -33,9 +36,8 @@ const twilioProvider: SmsProvider = {
 
   async sendTransactionConfirm(phone: string, amount: number, recipient: string): Promise<boolean> {
     try {
-      const apiUrl = import.meta.env.VITE_API_URL || 'https://sungku1-q3j44yhv.b4a.run';
       const message = `Sungku: Vous avez envoyé ${amount.toLocaleString()} FCFA à ${recipient}. Ref: ${Date.now()}`;
-      const response = await fetch(`${apiUrl}/api/sms/send`, {
+      const response = await fetch(`${API_URL}/api/sms/send`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ phone, message })
@@ -52,8 +54,7 @@ const afrimotechProvider: SmsProvider = {
   name: 'afrimotech',
   async sendOtp(phone: string, code: string): Promise<boolean> {
     try {
-      const apiUrl = import.meta.env.VITE_API_URL || 'https://sungku1-q3j44yhv.b4a.run';
-      const response = await fetch(`${apiUrl}/api/sms/send-otp`, {
+      const response = await fetch(`${API_URL}/api/sms/send-otp`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -71,9 +72,8 @@ const afrimotechProvider: SmsProvider = {
 
   async sendTransactionConfirm(phone: string, amount: number, recipient: string): Promise<boolean> {
     try {
-      const apiUrl = import.meta.env.VITE_API_URL || 'https://sungku1-q3j44yhv.b4a.run';
       const message = `Sungku: ${amount.toLocaleString()} FCFA envoyés à ${recipient}`;
-      const response = await fetch(`${apiUrl}/api/sms/send`, {
+      const response = await fetch(`${API_URL}/api/sms/send`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ phone, message, provider: 'afrimotech' })

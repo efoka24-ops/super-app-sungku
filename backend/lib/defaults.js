@@ -1,13 +1,9 @@
 import { nowIso } from "./store.js";
 
 export function defaultStats(userId, miniApps = 0) {
-  const seed = String(userId)
-    .split("")
-    .reduce((acc, char) => acc + char.charCodeAt(0), 0);
-
   return {
-    transfers: 10 + (seed % 40),
-    contacts: 5 + (seed % 25),
+    transfers: 0,
+    contacts: 0,
     miniApps,
     updatedAt: nowIso(),
   };

@@ -24,7 +24,8 @@ export default function LoginPage() {
         setError('Email ou mot de passe incorrect');
       }
     } catch (err) {
-      setError('Erreur de connexion. Veuillez réessayer.');
+      const message = err instanceof Error ? err.message : 'Erreur de connexion. Veuillez réessayer.';
+      setError(message);
     } finally {
       setLoading(false);
     }

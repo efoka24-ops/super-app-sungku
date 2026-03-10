@@ -5,6 +5,7 @@ import { Button } from "../../components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../../components/ui/dialog";
 import { Input } from "../../components/ui/input";
 import { Label } from "../../components/ui/label";
+import { buildApiUrl } from "../../lib/config";
 
 interface MiniAppCatalog {
   id: string;
@@ -44,7 +45,7 @@ export default function AdminMiniApps() {
   const loadMiniApps = async () => {
     try {
       // Simulate API call - replace with actual backend endpoint
-      const response = await fetch('https://sungku1-q3j44yhv.b4a.run/api/admin/miniapps-catalog');
+      const response = await fetch(buildApiUrl('/api/admin/miniapps-catalog'));
       if (response.ok) {
         const data = await response.json();
         setApps(data.apps);
@@ -170,7 +171,7 @@ export default function AdminMiniApps() {
 
     // Call backend API to toggle publish status
     try {
-      const response = await fetch(`https://sungku1-q3j44yhv.b4a.run/api/admin/miniapps-catalog/${appId}/publish`, {
+      const response = await fetch(buildApiUrl(`/api/admin/miniapps-catalog/${appId}/publish`), {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ published: !app.published })
@@ -194,7 +195,7 @@ export default function AdminMiniApps() {
     if (!app) return;
 
     try {
-      const response = await fetch(`https://sungku1-q3j44yhv.b4a.run/api/admin/miniapps-catalog/${appId}/featured`, {
+      const response = await fetch(buildApiUrl(`/api/admin/miniapps-catalog/${appId}/featured`), {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ featured: !app.featured })

@@ -6,6 +6,11 @@ import { ArrowLeft, Shield, Loader } from "lucide-react";
 import { motion } from "motion/react";
 import SmsService from "../lib/core/network/smsService";
 
+const rawApiUrl =
+  (import.meta.env.VITE_API_URL as string | undefined) ||
+  (import.meta.env.PROD ? "https://sungku1-q3j44yhv.b4a.run" : "http://localhost:4000");
+const API_BASE_URL = rawApiUrl.replace(/\/$/, "");
+
 export default function VerifyPhone() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -75,7 +80,7 @@ export default function VerifyPhone() {
       const formattedPhone = SmsService.formatPhoneNumber(phone);
       
       // Verify OTP with backend
-      const result = await fetch('https://sungku1-q3j44yhv.b4a.run/api/sms/verify-otp', {
+      const result = await fetch(`${API_BASE_URL}/api/sms/verify-otp`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

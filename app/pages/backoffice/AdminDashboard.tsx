@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router";
 import { Users, Layers, Bell, Settings, TrendingUp, Activity, Shield } from "lucide-react";
 import { useEffect, useState } from "react";
+import { buildApiUrl } from "../../lib/config";
 
 interface DashboardStats {
   totalUsers: number;
@@ -30,7 +31,7 @@ export default function AdminDashboard() {
   const loadDashboardStats = async () => {
     try {
       // Simulate API call - replace with actual backend endpoint
-      const response = await fetch('https://sungku1-q3j44yhv.b4a.run/api/admin/dashboard-stats');
+      const response = await fetch(buildApiUrl('/api/admin/dashboard-stats'));
       if (response.ok) {
         const data = await response.json();
         setStats(data);

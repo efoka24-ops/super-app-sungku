@@ -8,6 +8,11 @@ import { motion } from "motion/react";
 import { signup } from "../lib/core/network/authApi";
 import SmsService from "../lib/core/network/smsService";
 
+const rawApiUrl =
+  (import.meta.env.VITE_API_URL as string | undefined) ||
+  (import.meta.env.PROD ? "https://sungku1-q3j44yhv.b4a.run" : "http://localhost:4000");
+const API_BASE_URL = rawApiUrl.replace(/\/$/, "");
+
 export default function SignUp() {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
@@ -68,7 +73,7 @@ export default function SignUp() {
 
       // Send OTP via SMS (non-blocking - essai d'envoi)
       try {
-        const smsResult = await fetch('https://sungku1-q3j44yhv.b4a.run/api/sms/send-otp', {
+        const smsResult = await fetch(`${API_BASE_URL}/api/sms/send-otp`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({

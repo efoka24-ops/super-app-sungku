@@ -3,6 +3,7 @@ import BottomNav from "../components/BottomNav";
 import { Input } from "../components/ui/input";
 import { Button } from "../components/ui/button";
 import { Search, Send, DollarSign, Plus, Phone, Video, MoreVertical } from "lucide-react";
+import { buildApiUrl, API_ENDPOINTS } from "../lib/config";
 
 export default function Messages() {
   const [selectedChat, setSelectedChat] = useState<number | null>(null);
@@ -23,8 +24,7 @@ export default function Messages() {
       const fetchConversations = async () => {
         try {
           const response = await fetch(
-            `https://sungku-jazgwkbp.b4a.run/api/messages/${parsed.userId}`
-          `https://sungku1-q3j44yhv.b4a.run/api/messages/${parsed.userId}`
+            buildApiUrl(API_ENDPOINTS.MESSAGES(parsed.userId))
           );
           const data = await response.json();
           if (data.success) {
@@ -48,8 +48,7 @@ export default function Messages() {
     if (user) {
       try {
         const response = await fetch(
-          `https://sungku-jazgwkbp.b4a.run/api/messages/${user.userId}/${conversationId}`
-        `https://sungku1-q3j44yhv.b4a.run/api/messages/${user.userId}/${conversationId}`
+          buildApiUrl(API_ENDPOINTS.MESSAGES_CONVERSATION(user.userId, String(conversationId)))
         );
         const data = await response.json();
         if (data.success) {
@@ -66,8 +65,7 @@ export default function Messages() {
 
     try {
       const response = await fetch(
-        `https://sungku-jazgwkbp.b4a.run/api/messages/${user.userId}/${selectedChat}/send`,
-        `https://sungku1-q3j44yhv.b4a.run/api/messages/${user.userId}/${selectedChat}/send`,
+        buildApiUrl(API_ENDPOINTS.SEND_MESSAGE(user.userId, String(selectedChat))),
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },

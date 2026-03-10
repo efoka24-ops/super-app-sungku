@@ -19,7 +19,8 @@ const app = express();
 const PORT = Number(process.env.PORT || process.env.BACKEND_PORT || 4000);
 
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: '10mb' })); // Increased limit for avatar uploads
+app.use(express.urlencoded({ limit: '10mb', extended: true }));
 
 app.get("/api/health", (_req, res) => {
   res.json({ ok: true, service: "sungku-backend", timestamp: new Date().toISOString() });

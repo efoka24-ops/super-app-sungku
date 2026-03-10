@@ -4,6 +4,7 @@ import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
 import { useState, useEffect } from "react";
 import { useLanguage } from "../../lib/core/i18n";
+import { buildApiUrl, API_ENDPOINTS } from "../../lib/config";
 
 export default function ProfileInfo() {
   const navigate = useNavigate();
@@ -48,23 +49,64 @@ export default function ProfileInfo() {
 
     setUploadingPhoto(true);
     try {
-      // Convert to base64
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        const base64String = event.target?.result as string;
-        setAvatar(base64String);
-        // Save to localStorage
-        if (user) {
-          localStorage.setItem(`avatar_${user.userId}`, base64String);
-        }
-      };
-      reader.readAsDataURL(file);
+      // Compress image before upload
+      const compressedBase64 = await compressImage(file, 800, 800, 0.8);
+      setAvatar(compressedBase64);
+      
+      // Save to localStorage
+      if (user) {
+        localStorage.setItem(`avatar_${user.userId}`, compressedBase64);
+      }
     } catch (error) {
       console.error("Photo upload error:", error);
       alert("Erreur lors de l'upload de la photo");
     } finally {
       setUploadingPhoto(false);
     }
+  };
+
+  // Compress image to reduce payload size
+  const compressImage = (file: File, maxWidth: number, maxHeight: number, quality: number): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          let width = img.width;
+          let height = img.height;
+
+          // Calculate new dimensions
+          if (width > height) {
+            if (width > maxWidth) {
+              height = (height * maxWidth) / width;
+              width = maxWidth;
+            }
+          } else {
+            if (height > maxHeight) {
+              width = (width * maxHeight) / height;
+              height = maxHeight;
+            }
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          if (!ctx) {
+            reject(new Error('Could not get canvas context'));
+            return;
+          }
+
+          ctx.drawImage(img, 0, 0, width, height);
+          const compressedBase64 = canvas.toDataURL('image/jpeg', quality);
+          resolve(compressedBase64);
+        };
+        img.onerror = () => reject(new Error('Failed to load image'));
+        img.src = e.target?.result as string;
+      };
+      reader.onerror = () => reject(new Error('Failed to read file'));
+      reader.readAsDataURL(file);
+    });
   };
 
   const handleSave = async () => {
@@ -74,7 +116,7 @@ export default function ProfileInfo() {
     // Save avatar to backend if it exists
     if (avatar && user) {
       try {
-        await fetch(`https://sungku1-q3j44yhv.b4a.run/api/profile/${user.userId}/avatar`, {
+        await fetch(buildApiUrl(API_ENDPOINTS.AVATAR(user.userId)), {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ avatar }),

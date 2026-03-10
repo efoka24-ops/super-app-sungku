@@ -35,14 +35,10 @@ function writeStatsStore(store) {
   fs.writeFileSync(STATS_FILE, JSON.stringify(store, null, 2), 'utf-8');
 }
 
-function defaultStatsForUser(userId, miniAppsCount) {
-  const base = userId
-    .split('')
-    .reduce((acc, ch) => acc + ch.charCodeAt(0), 0);
-
+function defaultStatsForUser(_userId, miniAppsCount) {
   return {
-    transfers: 10 + (base % 40),
-    contacts: 5 + (base % 25),
+    transfers: 0,
+    contacts: 0,
     miniApps: Number.isFinite(miniAppsCount) ? miniAppsCount : 0,
     updatedAt: new Date().toISOString(),
   };
@@ -98,7 +94,15 @@ const server = http.createServer((req, res) => {
     }
 
     const store = readStatsStore();
-    if (!store[userId]) {
+    const current = store[userId];
+    const isLegacyShape =
+      !current ||
+      typeof current !== 'object' ||
+      typeof current.transfers !== 'number' ||
+      typeof current.contacts !== 'number' ||
+      !('miniApps' in current);
+
+    if (isLegacyShape) {
       store[userId] = defaultStatsForUser(userId, miniApps);
       writeStatsStore(store);
     }

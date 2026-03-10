@@ -1,4 +1,8 @@
-const API_BASE = import.meta.env.VITE_API_URL || "https://sungku1-q3j44yhv.b4a.run/api";
+const rawApiUrl =
+  (import.meta.env.VITE_API_URL as string | undefined) ||
+  (import.meta.env.PROD ? "https://sungku1-q3j44yhv.b4a.run" : "http://localhost:4000");
+const normalizedBase = rawApiUrl.replace(/\/$/, "");
+const API_BASE = normalizedBase.endsWith('/api') ? normalizedBase : `${normalizedBase}/api`;
 
 interface SignupRequest {
   firstName: string;
@@ -44,7 +48,7 @@ export async function signup(data: SignupRequest): Promise<SignupResponse> {
     return await response.json();
   } catch (error) {
     console.error("Signup error:", error);
-    throw error;
+    throw new Error("Connexion backend impossible (URL/CORS/réseau)");
   }
 }
 

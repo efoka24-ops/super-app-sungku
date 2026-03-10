@@ -3,6 +3,7 @@ import { useNavigate } from "react-router";
 import { ArrowLeft, Search, Shield, Ban, CheckCircle, Mail, Phone } from "lucide-react";
 import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
+import { buildApiUrl, API_ENDPOINTS } from "../../lib/config";
 
 interface User {
   userId: string;
@@ -31,7 +32,7 @@ export default function AdminUsers() {
 
   const loadUsers = async () => {
     try {
-      const response = await fetch('https://sungku1-q3j44yhv.b4a.run/api/admin/users');
+      const response = await fetch(buildApiUrl(API_ENDPOINTS.USERS));
       if (response.ok) {
         const data = await response.json();
         setUsers(data.users);
@@ -114,7 +115,7 @@ export default function AdminUsers() {
 
   const toggleUserStatus = async (userId: string, newStatus: User['status']) => {
     try {
-      await fetch(`https://sungku1-q3j44yhv.b4a.run/api/admin/users/${userId}/status`, {
+      await fetch(buildApiUrl(`/api/admin/users/${userId}/status`), {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: newStatus })

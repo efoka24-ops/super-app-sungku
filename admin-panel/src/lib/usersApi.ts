@@ -1,4 +1,4 @@
-const API_BASE_URL = 'https://sungku1-q3j44yhv.b4a.run/api/admin';
+import { ADMIN_API_BASE_URL } from './apiBase';
 
 export interface User {
   userId: string;
@@ -18,7 +18,7 @@ export interface User {
  */
 export async function getUsers(): Promise<User[]> {
   try {
-    const response = await fetch(`${API_BASE_URL}/users?limit=100`);
+    const response = await fetch(`${ADMIN_API_BASE_URL}/users?limit=100`);
     if (!response.ok) throw new Error('Failed to fetch users');
     
     const data = await response.json();
@@ -34,7 +34,7 @@ export async function getUsers(): Promise<User[]> {
  */
 export async function updateUserStatus(userId: string, status: string): Promise<boolean> {
   try {
-    const response = await fetch(`${API_BASE_URL}/users/${userId}/status`, {
+    const response = await fetch(`${ADMIN_API_BASE_URL}/users/${userId}/status`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ status })
@@ -53,7 +53,7 @@ export async function updateUserStatus(userId: string, status: string): Promise<
  */
 export async function getUserStats() {
   try {
-    const response = await fetch(`${API_BASE_URL}/dashboard`);
+    const response = await fetch(`${ADMIN_API_BASE_URL}/dashboard`);
     if (!response.ok) throw new Error('Failed to fetch stats');
     
     return await response.json();

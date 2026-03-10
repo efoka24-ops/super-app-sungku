@@ -4,8 +4,8 @@
  */
 
 export const API_CONFIG = {
-  // Production - Back4App
-  PRODUCTION: 'https://sungku1-q3j44yhv.b4a.run',
+  // Production - Use environment variable with online fallback
+  PRODUCTION: import.meta.env.VITE_API_URL || 'https://sungku1-q3j44yhv.b4a.run',
   
   // Development - Local
   DEVELOPMENT: 'http://localhost:4000',

@@ -4,6 +4,7 @@ import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
 import { ArrowLeft, Phone, Lock, Eye, EyeOff, Fingerprint, AlertCircle } from "lucide-react";
+import { buildApiUrl, API_ENDPOINTS } from "../lib/config";
 
 export default function SignIn() {
   const navigate = useNavigate();
@@ -23,7 +24,7 @@ export default function SignIn() {
 
     try {
       // Fetch user from backend
-      const usersResponse = await fetch("https://sungku1-q3j44yhv.b4a.run/api/admin/users");
+      const usersResponse = await fetch(buildApiUrl(API_ENDPOINTS.USERS));
       const usersData = await usersResponse.json();
 
       if (!usersData.success) {

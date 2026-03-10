@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import { Button } from "../components/ui/button";
 import { useState, useEffect } from "react";
+import { buildApiUrl, API_ENDPOINTS } from "../lib/config";
 
 const quickActions = [
   { icon: Send, label: "Envoyer", color: "bg-emerald-50 text-emerald-600", path: "/send-money" },
@@ -67,7 +68,7 @@ export default function Home() {
     // Fetch stats from backend
     const fetchStats = async () => {
       try {
-        const response = await fetch(`https://sungku1-q3j44yhv.b4a.run/api/profile/${user.userId}/stats`);
+        const response = await fetch(buildApiUrl(API_ENDPOINTS.STATS(user.userId)));
         const data = await response.json();
         if (data.stats) {
           setStats(data.stats);
@@ -80,7 +81,7 @@ export default function Home() {
     // Fetch mini-apps catalog from backend
     const fetchMiniApps = async () => {
       try {
-        const response = await fetch('https://sungku1-q3j44yhv.b4a.run/api/admin/miniapps-catalog');
+        const response = await fetch(buildApiUrl('/api/admin/miniapps-catalog'));
         const data = await response.json();
         if (data.miniApps && Array.isArray(data.miniApps)) {
           // Map backend data to component format

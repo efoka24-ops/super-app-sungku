@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
+import { ADMIN_API_BASE_URL } from '../lib/apiBase';
 
 interface AuthContextType {
   isAuthenticated: boolean;
@@ -7,7 +8,12 @@ interface AuthContextType {
   logout: () => void;
 }
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+declare global {
+  var __SUNGKU_AUTH_CONTEXT__: React.Context<AuthContextType | undefined> | undefined;
+}
+
+const AuthContext = globalThis.__SUNGKU_AUTH_CONTEXT__ ?? createContext<AuthContextType | undefined>(undefined);
+globalThis.__SUNGKU_AUTH_CONTEXT__ = AuthContext;
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -15,23 +21,28 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const login = async (email: string, password: string): Promise<boolean> => {
     try {
-      const response = await fetch('https://sungku-jazgwkbp.b4a.run/api/admin/login', {
+      const response = await fetch(`${ADMIN_API_BASE_URL}/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password })
       });
 
-      if (response.ok) {
-        const data = await response.json();
-        localStorage.setItem('adminToken', data.token);
-        setIsAuthenticated(true);
-        setAdminName(data.name || 'Admin');
-        return true;
+      if (response.status === 401) {
+        return false;
       }
-      return false;
+
+      if (!response.ok) {
+        throw new Error('Le serveur a refusé la connexion. Vérifie l’URL backend et CORS.');
+      }
+
+      const data = await response.json();
+      localStorage.setItem('adminToken', data.token);
+      setIsAuthenticated(true);
+      setAdminName(data.admin?.name || 'Admin');
+      return true;
     } catch (error) {
       console.error('Login error:', error);
-      return false;
+      throw new Error('Connexion impossible au backend (réseau/CORS/URL).');
     }
   };
 

@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router";
 import { ArrowLeft, TrendingUp, Users, Activity, Download } from "lucide-react";
 import { Button } from "../../components/ui/button";
+import { buildApiUrl } from "../../lib/config";
 
 interface AnalyticsData {
   userGrowth: { month: string; count: number }[];
@@ -27,7 +28,7 @@ export default function AdminAnalytics() {
 
   const loadAnalytics = async () => {
     try {
-      const response = await fetch(`https://sungku1-q3j44yhv.b4a.run/api/admin/analytics?period=${period}`);
+      const response = await fetch(buildApiUrl(`/api/admin/analytics?period=${period}`));
       if (response.ok) {
         const data = await response.json();
         setAnalytics(data);

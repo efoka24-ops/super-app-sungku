@@ -1,4 +1,6 @@
-const API_BASE = import.meta.env.VITE_API_URL || "https://sungku1-q3j44yhv.b4a.run/api";
+const API_BASE =
+  import.meta.env.VITE_API_URL ||
+  (import.meta.env.PROD ? "https://sungku1-q3j44yhv.b4a.run/api" : "http://localhost:4000/api");
 
 export interface Notification {
   id: string;
