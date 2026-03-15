@@ -3,11 +3,13 @@ import AdminLayout from '../components/AdminLayout';
 import { Upload, Trash2, Eye, EyeOff, Plus, CheckCircle, AlertCircle, Loader } from 'lucide-react';
 import {
   getMiniAppsCatalog,
+  createMiniApp,
   togglePublishStatus,
   toggleFeaturedStatus,
   deleteMiniApp as deleteMiniAppApi,
   MiniApp as ApiMiniApp
 } from '../lib/miniappsApi';
+import { uploadMiniAppApk } from '../lib/backofficeApi';
 
 interface MiniApp extends Omit<ApiMiniApp, 'fileSize'> {
   fileSize?: string | number;
@@ -50,7 +52,7 @@ export default function MiniAppsPage() {
     }
   };
 
-  const handleAddMiniApp = (e: React.FormEvent) => {
+  const handleAddMiniApp = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!formData.name || !formData.fileName || !selectedFile) {
@@ -58,21 +60,31 @@ export default function MiniAppsPage() {
       return;
     }
 
-    const newApp: MiniApp = {
-      id: Date.now().toString(),
+    const uploaded = await uploadMiniAppApk(selectedFile);
+    if (!uploaded) {
+      setSuccessMessage('Upload APK impossible');
+      setTimeout(() => setSuccessMessage(''), 3000);
+      return;
+    }
+
+    const newApp = await createMiniApp({
       name: formData.name,
       description: formData.description,
       category: formData.category,
-      fileSize: (selectedFile.size / (1024 * 1024)).toFixed(1) + ' MB',
       published: true,
       featured: false,
-      installations: 0,
-      rating: 0,
-      uploadedAt: new Date().toISOString().split('T')[0],
-      fileName: formData.fileName
-    };
+      fileSize: uploaded.size,
+      fileName: uploaded.originalName,
+      fileUrl: uploaded.url
+    });
 
-    setMiniApps([...miniApps, newApp]);
+    if (!newApp) {
+      setSuccessMessage('Erreur lors de la création de la mini-app');
+      setTimeout(() => setSuccessMessage(''), 3000);
+      return;
+    }
+
+    setMiniApps([newApp as MiniApp, ...miniApps]);
     setFormData({ name: '', description: '', category: 'logistics', fileName: '' });
     setSelectedFile(null);
     setShowAddForm(false);
@@ -282,6 +294,14 @@ export default function MiniAppsPage() {
                       <div className="flex justify-between text-sm">
                         <span className="text-gray-600">Installations:</span>
                         <span className="font-medium text-emerald-600">{app.installations.toLocaleString()}</span>
+                      </div>
+                      <div className="flex justify-between text-sm">
+                        <span className="text-gray-600">Users uniques:</span>
+                        <span className="font-medium text-gray-900">{Number((app as any).uniqueUsers || 0).toLocaleString()}</span>
+                      </div>
+                      <div className="flex justify-between text-sm">
+                        <span className="text-gray-600">Téléphones uniques:</span>
+                        <span className="font-medium text-gray-900">{Number((app as any).uniquePhones || 0).toLocaleString()}</span>
                       </div>
                       <div className="flex justify-between text-sm">
                         <span className="text-gray-600">Rating:</span>

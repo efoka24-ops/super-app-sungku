@@ -1,28 +1,50 @@
-import { createClient } from "@supabase/supabase-js";
+/**
+ * db.js — Firestore (Firebase) comme base de données principale
+ * ────────────────────────────────────────────────────────────────
+ * Remplace Supabase. Fournit exactement le même contrat API :
+ *   db.from(collection).select().eq().order().limit().maybeSingle()
+ *   db.from(collection).insert(data)
+ *   db.from(collection).update(data).eq(field, val)
+ *   db.from(collection).upsert(data, opts)
+ *   db.from(collection).delete().eq(field, val)
+ *
+ * Prérequis dans .env :
+ *   FIREBASE_SERVICE_ACCOUNT_JSON=<base64 du service account JSON>
+ *   FIREBASE_PROJECT_ID=sungku-send
+ */
 
-const url = process.env.SUPABASE_URL;
-const key = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_PUBLISHABLE_KEY;
+import admin from "firebase-admin";
+import { createFirestoreDb } from "./firestoreDb.js";
 
-if (!url || !key) {
-  console.warn("⚠️  SUPABASE_URL or key missing — DB writes will fall back to JSON.");
-}
+const serviceAccountB64 = process.env.FIREBASE_SERVICE_ACCOUNT_JSON;
+let db = null;
 
-export const db = url && key
-  ? createClient(url, key, { auth: { autoRefreshToken: false, persistSession: false } })
-  : null;
-
-// Validate tables exist on startup
-if (db) {
-  db.from("users").select("user_id").limit(1).then(({ error }) => {
-    if (error?.code === "42P01") {
-      console.warn("⚠️  Supabase tables not found. Run the migration SQL at:");
-      console.warn("   https://supabase.com/dashboard/project/uybhscmvncjxsokzgyuu/sql/new");
-    } else if (error) {
-      console.warn("⚠️  Supabase check:", error.message);
-    } else {
-      console.log("✅ Supabase REST connected — tables ready");
+if (serviceAccountB64) {
+  try {
+    if (!admin.apps.length) {
+      const sa = JSON.parse(Buffer.from(serviceAccountB64, "base64").toString("utf-8"));
+      admin.initializeApp({
+        credential: admin.credential.cert(sa),
+        projectId: process.env.FIREBASE_PROJECT_ID || sa.project_id,
+      });
     }
-  }).catch(() => {});
+    db = createFirestoreDb();
+
+    // Vérification de connexion non-bloquante
+    admin.apps[0]
+      .firestore()
+      .collection("_health")
+      .limit(1)
+      .get()
+      .then(() => console.log("✅ Firestore connected — tables ready"))
+      .catch((e) => console.warn("⚠️  Firestore check:", e.message));
+  } catch (e) {
+    console.warn("[Firestore] Init failed:", e.message);
+    db = null;
+  }
+} else {
+  console.warn("⚠️  FIREBASE_SERVICE_ACCOUNT_JSON missing — DB writes will fall back to JSON.");
 }
 
+export { db };
 export default db;

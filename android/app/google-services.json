@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1056910886830",
+    "project_id": "sungku-send",
+    "storage_bucket": "sungku-send.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1056910886830:android:4a8f9efbb6f5cd47f96a3f",
+        "android_client_info": {
+          "package_name": "com.sungku.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC60yB7Jf8AOxgB-EkVgr7cH88hYuViHlk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

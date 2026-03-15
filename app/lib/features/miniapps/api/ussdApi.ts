@@ -7,6 +7,7 @@ interface USSDRequest {
   operator: string;
   amount?: number;
   description?: string;
+  userId?: string;
 }
 
 interface USSDResponse {
@@ -26,14 +27,16 @@ export async function initiateUSSD(
   phoneNumber: string,
   operator: string,
   amount?: number,
-  description?: string
+  description?: string,
+  userId?: string
 ): Promise<USSDResponse> {
   try {
     const payload: USSDRequest = {
       phoneNumber,
       operator,
       amount,
-      description
+      description,
+      userId
     };
 
     const response = await fetch(`${API_BASE}/initiate`, {
@@ -54,6 +57,36 @@ export async function initiateUSSD(
     console.error('USSD API Error:', error);
     throw error;
   }
+}
+
+/**
+ * Launch USSD flow by opening phone dialer with encoded short code.
+ */
+export async function launchUSSDDialer(ussdCode: string): Promise<void> {
+  const encoded = ussdCode.replace(/#/g, "%23");
+  window.location.href = `tel:${encoded}`;
+}
+
+/**
+ * Confirm transaction result after user returns from USSD flow.
+ */
+export async function confirmUSSDTransaction(
+  transactionId: string,
+  success: boolean,
+  reason?: string,
+  userId?: string
+): Promise<USSDResponse> {
+  const response = await fetch(`${API_BASE}/confirm/${transactionId}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ success, reason, userId })
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to confirm transaction");
+  }
+
+  return response.json();
 }
 
 /**

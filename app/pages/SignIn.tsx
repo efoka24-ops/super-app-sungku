@@ -1,10 +1,13 @@
 import { useState } from "react";
 import { useNavigate } from "react-router";
+import { registerPlugin } from "@capacitor/core";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
 import { ArrowLeft, Phone, Lock, Eye, EyeOff, Fingerprint, AlertCircle } from "lucide-react";
 import { buildApiUrl, API_ENDPOINTS } from "../lib/config";
+
+const NativeBiometric = registerPlugin<any>("NativeBiometric");
 
 export default function SignIn() {
   const navigate = useNavigate();
@@ -64,6 +67,18 @@ export default function SignIn() {
       );
 
       localStorage.setItem("authToken", `token_${user.userId}`);
+      if (rememberMe) {
+        localStorage.setItem(
+          "biometric.user",
+          JSON.stringify({
+            userId: user.userId,
+            firstName: user.firstName,
+            lastName: user.lastName,
+            phone: user.phone,
+            email: user.email,
+          })
+        );
+      }
       navigate("/home");
     } catch (err) {
       console.error("Login error:", err);
@@ -73,9 +88,36 @@ export default function SignIn() {
     }
   };
 
-  const handleBiometric = () => {
-    // Simulate biometric authentication
-    setError("Biométrie non disponible pour le moment");
+  const handleBiometric = async () => {
+    setError("");
+    const cached = localStorage.getItem("biometric.user");
+    if (!cached) {
+      setError("Activez 'Se souvenir de moi' lors d'une connexion classique d'abord.");
+      return;
+    }
+
+    try {
+      try {
+        await NativeBiometric.verifyIdentity({
+          reason: "Connexion biométrique Sungku"
+        });
+      } catch {
+        // Fallback for devices without plugin support
+        const accepted = window.confirm("Simuler la validation biométrique ?");
+        if (!accepted) {
+          setError("Validation biométrique annulée");
+          return;
+        }
+      }
+
+      const savedUser = JSON.parse(cached);
+      localStorage.setItem("user", JSON.stringify(savedUser));
+      localStorage.setItem("authToken", `token_${savedUser.userId}`);
+      navigate("/home");
+    } catch (error) {
+      console.error("Biometric auth error", error);
+      setError("Connexion biométrique indisponible sur cet appareil");
+    }
   };
 
   return (

@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
-import { Search, Filter, MoreVertical, Shield, LogOut, Loader } from 'lucide-react';
+import { useNavigate } from 'react-router';
+import { Search, Loader } from 'lucide-react';
 import AdminLayout from '../components/AdminLayout';
-import { getUsers, User as UserType } from '../lib/usersApi';
+import { getUsers, updateUserStatus, User as UserType } from '../lib/usersApi';
 
 interface User {
   userId: string;
@@ -18,10 +19,12 @@ interface User {
 }
 
 export default function UsersPage() {
+  const navigate = useNavigate();
   const [users, setUsers] = useState<User[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [filter, setFilter] = useState<'all' | 'active' | 'suspended' | 'blocked'>('all');
   const [loading, setLoading] = useState(true);
+  const [updatingUserId, setUpdatingUserId] = useState<string | null>(null);
 
   useEffect(() => {
     loadUsers();
@@ -74,6 +77,19 @@ export default function UsersPage() {
       blocked: 'bg-red-100 text-red-800'
     };
     return colors[status] || 'bg-gray-100 text-gray-800';
+  };
+
+  const handleStatusChange = async (userId: string, status: User['status']) => {
+    setUpdatingUserId(userId);
+    const updated = await updateUserStatus(userId, status);
+    if (updated) {
+      setUsers((currentUsers) =>
+        currentUsers.map((user) =>
+          user.userId === userId ? { ...user, status } : user
+        )
+      );
+    }
+    setUpdatingUserId(null);
   };
 
   return (
@@ -158,9 +174,35 @@ export default function UsersPage() {
                         </span>
                       </td>
                       <td className="px-6 py-4">
-                        <button className="text-gray-400 hover:text-gray-600">
-                          <MoreVertical className="w-5 h-5" />
-                        </button>
+                        <div className="flex flex-wrap gap-2">
+                          <button
+                            onClick={() => navigate(`/users/${user.userId}`)}
+                            className="px-3 py-1 text-xs rounded-lg bg-blue-50 text-blue-700 hover:bg-blue-100"
+                          >
+                            Détails
+                          </button>
+                          <button
+                            onClick={() => handleStatusChange(user.userId, 'active')}
+                            disabled={updatingUserId === user.userId}
+                            className="px-3 py-1 text-xs rounded-lg bg-green-50 text-green-700 hover:bg-green-100 disabled:opacity-50"
+                          >
+                            Activer
+                          </button>
+                          <button
+                            onClick={() => handleStatusChange(user.userId, 'suspended')}
+                            disabled={updatingUserId === user.userId}
+                            className="px-3 py-1 text-xs rounded-lg bg-yellow-50 text-yellow-700 hover:bg-yellow-100 disabled:opacity-50"
+                          >
+                            Suspendre
+                          </button>
+                          <button
+                            onClick={() => handleStatusChange(user.userId, 'blocked')}
+                            disabled={updatingUserId === user.userId}
+                            className="px-3 py-1 text-xs rounded-lg bg-red-50 text-red-700 hover:bg-red-100 disabled:opacity-50"
+                          >
+                            Bloquer
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ))}

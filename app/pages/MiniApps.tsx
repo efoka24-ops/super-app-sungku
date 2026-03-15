@@ -1,5 +1,6 @@
 import BottomNav from "../components/BottomNav";
 import { Input } from "../components/ui/input";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import {
   Search,
@@ -19,7 +20,11 @@ import {
   Gamepad2,
   TrendingUp,
   Send,
+  Download,
+  ExternalLink,
+  Brain,
 } from "lucide-react";
+import { fetchInstalledMiniApps, installMiniApp } from "../lib/features/miniapps/miniappsApi";
 
 const categories = [
   { label: "Tous", active: true },
@@ -29,6 +34,15 @@ const categories = [
 ];
 
 const miniApps = [
+  {
+    icon: Brain,
+    title: "KowSy",
+    description: "Assistant dépenses & budget IA",
+    color: "bg-amber-400",
+    users: "Nouveau !",
+    featured: true,
+    route: "/miniapps/kowsy",
+  },
   {
     icon: Send,
     title: "Sungku Send",
@@ -162,6 +176,41 @@ const miniApps = [
 
 export default function MiniApps() {
   const navigate = useNavigate();
+  const [installedIds, setInstalledIds] = useState<string[]>([]);
+  const [installingId, setInstallingId] = useState<string | null>(null);
+
+  useEffect(() => {
+    const loadInstalled = async () => {
+      const userStr = localStorage.getItem("user");
+      if (!userStr) return;
+      const user = JSON.parse(userStr);
+      const apps = await fetchInstalledMiniApps(user.userId);
+      setInstalledIds(apps.map((a) => a.appId));
+    };
+    loadInstalled();
+  }, []);
+
+  const handleInstallOrOpen = async (appId: string, route?: string) => {
+    if (installedIds.includes(appId)) {
+      if (route) navigate(route);
+      return;
+    }
+
+    const userStr = localStorage.getItem("user");
+    if (!userStr) {
+      navigate("/signin");
+      return;
+    }
+
+    const user = JSON.parse(userStr);
+    setInstallingId(appId);
+    const installed = await installMiniApp(user.userId, appId, user.phone);
+    setInstallingId(null);
+    if (!installed) return;
+
+    setInstalledIds((prev) => [...new Set([...prev, appId])]);
+    if (route) navigate(route);
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 pb-20">
@@ -203,6 +252,8 @@ export default function MiniApps() {
             .filter((app) => app.featured)
             .map((app) => {
               const Icon = app.icon;
+              const appId = app.title.toLowerCase().replace(/\s+/g, "-");
+              const isInstalled = installedIds.includes(appId);
               return (
                 <div
                   key={app.title}
@@ -216,10 +267,24 @@ export default function MiniApps() {
                     <p className="text-sm text-gray-500 mb-2">{app.description}</p>
                     <p className="text-xs text-emerald-500 font-medium">{app.users}</p>
                   </div>
-                  <button className="px-6 py-2 bg-emerald-500 text-white rounded-lg font-medium text-sm hover:bg-emerald-600 transition-colors"
-                    onClick={() => app.route ? navigate(app.route) : null}
+                  <button
+                    className="px-4 py-2 bg-emerald-500 text-white rounded-lg font-medium text-sm hover:bg-emerald-600 transition-colors flex items-center gap-2"
+                    onClick={() => handleInstallOrOpen(appId, app.route)}
+                    disabled={installingId === appId}
                   >
-                    Ouvrir
+                    {installingId === appId ? (
+                      "Installation..."
+                    ) : isInstalled ? (
+                      <>
+                        <ExternalLink className="w-4 h-4" />
+                        Ouvrir
+                      </>
+                    ) : (
+                      <>
+                        <Download className="w-4 h-4" />
+                        Installer
+                      </>
+                    )}
                   </button>
                 </div>
               );

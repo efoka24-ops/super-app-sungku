@@ -1,14 +1,19 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
-import { Phone, Users, AlertCircle, CheckCircle, Loader, ArrowLeft } from 'lucide-react';
+import { Phone, Users, AlertCircle, CheckCircle, Loader, ArrowLeft, CreditCard, Smartphone } from 'lucide-react';
 import {
   detectOperator,
   getOperatorConfig,
+  generateUSSDCode,
   formatCameroonNumber,
   isValidCameroonNumber,
   type Operator
 } from '../utils/operatorDetection';
-import { initiateUSSD } from '../api/ussdApi';
+import { confirmUSSDTransaction, initiateUSSD, launchUSSDDialer } from '../api/ussdApi';
+import { fetchDeviceOrSavedContacts, type Contact } from '../../contacts/contactsApi';
+import { fetchInstalledMiniApps, installMiniApp } from '../miniappsApi';
+import { checkNotchPayTransfer, sendNotchPayTransfer } from '../../payments/api/notchpayTransferApi';
+import { toUserErrorMessage } from '../../../core/network/errorMessages';
 
 export default function SungkuSendPage() {
   const navigate = useNavigate();
@@ -20,14 +25,158 @@ export default function SungkuSendPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [step, setStep] = useState<'form' | 'confirm' | 'sending'>('form');
+  const [deviceContacts, setDeviceContacts] = useState<Contact[]>([]);
+  const [contactsLoading, setContactsLoading] = useState(false);
+  const [installed, setInstalled] = useState(false);
+  const [installing, setInstalling] = useState(false);
+  const [pendingTransactionId, setPendingTransactionId] = useState<string | null>(null);
+  const [pendingUSSDCode, setPendingUSSDCode] = useState<string>('');
+  const [senderPhone, setSenderPhone] = useState('');
+  const [pendingNotchPayRef, setPendingNotchPayRef] = useState<string | null>(null);
+  const [paymentMethod, setPaymentMethod] = useState<'ussd' | 'notchpay'>('ussd');
+  const [paymentInfo, setPaymentInfo] = useState('');
 
-  // Mock contacts
-  const mockContacts = [
-    { name: 'Jean Dupont', phone: '656789012', operator: 'orange' as Operator },
-    { name: 'Marie Martin', phone: '687654321', operator: 'mtn' as Operator },
-    { name: 'Paul Soe', phone: '659876543', operator: 'orange' as Operator },
-    { name: 'Sophie Legrand', phone: '681234567', operator: 'mtn' as Operator }
-  ];
+  const getCameroonPhone = (value: string) => {
+    const digits = String(value || '').replace(/\D/g, '');
+    if (digits.startsWith('237') && digits.length >= 12) return `+${digits}`;
+    if (digits.startsWith('6') && digits.length === 9) return `+237${digits}`;
+    return value;
+  };
+
+  const getNotchChannel = (value: string) => {
+    const op = detectOperator(value);
+    if (op === 'mtn') return 'cm.mtn';
+    if (op === 'orange') return 'cm.orange';
+    return 'cm.mtn';
+  };
+
+  useEffect(() => {
+    const userStr = localStorage.getItem('user');
+    if (!userStr) return;
+    const user = JSON.parse(userStr);
+
+    // Pre-fill sender phone from logged-in user
+    if (user.phone) setSenderPhone(user.phone);
+
+    fetchInstalledMiniApps(user.userId)
+      .then((apps) => setInstalled(apps.some((app) => app.appId === 'sungku-send')))
+      .catch(() => setInstalled(false));
+  }, []);
+
+  useEffect(() => {
+    const onVisibilityChange = async () => {
+      if (document.visibilityState !== 'visible' || !pendingTransactionId) return;
+      const userStr = localStorage.getItem('user');
+      const user = userStr ? JSON.parse(userStr) : null;
+
+      try {
+        // Auto-confirm: user returned from the USSD dialer, assume they completed it
+        await confirmUSSDTransaction(
+          pendingTransactionId,
+          true,
+          undefined,
+          user?.userId
+        );
+
+        navigate('/miniapps/sungku-send/result', {
+          state: {
+            success: true,
+            transactionId: pendingTransactionId,
+            operator: detectedOperator,
+            senderPhone,
+            phoneNumber: formatCameroonNumber(phoneNumber),
+            amount,
+            message: 'Transaction confirmée via USSD',
+            code: pendingUSSDCode
+          }
+        });
+      } catch {
+        setError('Impossible de confirmer le résultat USSD.');
+        setStep('confirm');
+      } finally {
+        setPendingTransactionId(null);
+        setPendingUSSDCode('');
+      }
+    };
+
+    document.addEventListener('visibilitychange', onVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', onVisibilityChange);
+  }, [pendingTransactionId, pendingUSSDCode, navigate, detectedOperator, phoneNumber, amount]);
+
+  useEffect(() => {
+    if (!pendingNotchPayRef) return;
+
+    const onVisibilityChange = async () => {
+      if (document.visibilityState !== 'visible') return;
+      try {
+        setPaymentInfo('Verification du transfert NotchPay...');
+        const result = await checkNotchPayTransfer(pendingNotchPayRef);
+        if (result.status === 'completed') {
+          setPendingNotchPayRef(null);
+          setPaymentInfo('');
+          navigate('/miniapps/sungku-send/result', {
+            state: {
+              success: true,
+              transactionId: pendingNotchPayRef,
+              operator: 'NotchPay',
+              senderPhone,
+              phoneNumber: formatCameroonNumber(phoneNumber),
+              amount,
+              message: 'Transaction NotchPay confirmee',
+            }
+          });
+        } else if (result.status === 'failed') {
+          setError(result.message || 'Transfert NotchPay echoue');
+          setPaymentInfo('');
+          setStep('confirm');
+        } else {
+          setPaymentInfo('Transfert en attente. Revenez ici puis relancez la verification si necessaire.');
+          setStep('confirm');
+        }
+      } catch (err) {
+        setError(toUserErrorMessage(err, 'Verification NotchPay impossible'));
+        setStep('confirm');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    document.addEventListener('visibilitychange', onVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', onVisibilityChange);
+  }, [pendingNotchPayRef, navigate, senderPhone, phoneNumber, amount]);
+
+  const verifyPendingNotchPayTransfer = async () => {
+    if (!pendingNotchPayRef) return;
+    setLoading(true);
+    setError('');
+    try {
+      const result = await checkNotchPayTransfer(pendingNotchPayRef);
+      if (result.status === 'completed') {
+        setPendingNotchPayRef(null);
+        setPaymentInfo('');
+        navigate('/miniapps/sungku-send/result', {
+          state: {
+            success: true,
+            transactionId: pendingNotchPayRef,
+            operator: 'NotchPay',
+            senderPhone,
+            phoneNumber: formatCameroonNumber(phoneNumber),
+            amount,
+            message: 'Transaction NotchPay confirmee',
+          }
+        });
+      } else if (result.status === 'failed') {
+        setError(result.message || 'Transfert NotchPay echoue');
+        setPaymentInfo('');
+      } else {
+        setPaymentInfo('Transfert toujours en attente chez NotchPay.');
+      }
+    } catch (err) {
+      setError(toUserErrorMessage(err, 'Verification NotchPay impossible'));
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     let value = e.target.value.replace(/\D/g, '');
@@ -46,14 +195,46 @@ export default function SungkuSendPage() {
     }
   };
 
-  const selectContact = (contact: typeof mockContacts[0]) => {
-    setPhoneNumber(contact.phone);
-    setDetectedOperator(contact.operator);
+  const selectContact = (contact: Contact) => {
+    setPhoneNumber(contact.phoneNumber);
+    setDetectedOperator(detectOperator(contact.phoneNumber));
     setShowContactList(false);
+  };
+
+  const handleOpenContacts = async () => {
+    const userStr = localStorage.getItem('user');
+    if (!userStr) {
+      setError('Veuillez vous connecter pour accéder aux contacts.');
+      return;
+    }
+    const user = JSON.parse(userStr);
+    setContactsLoading(true);
+    const contacts = await fetchDeviceOrSavedContacts(user.userId);
+    setDeviceContacts(contacts);
+    setShowContactList(true);
+    setContactsLoading(false);
+  };
+
+  const handleInstallMiniApp = async () => {
+    const userStr = localStorage.getItem('user');
+    if (!userStr) {
+      setError('Connectez-vous d\'abord pour installer cette mini-app.');
+      return;
+    }
+    const user = JSON.parse(userStr);
+    setInstalling(true);
+    const installedApp = await installMiniApp(user.userId, 'sungku-send', user.phone);
+    setInstalling(false);
+    if (!installedApp) {
+      setError('Installation échouée. Réessayez.');
+      return;
+    }
+    setInstalled(true);
   };
 
   const handleSend = async () => {
     setError('');
+    setPaymentInfo('');
 
     // Validations
     if (!phoneNumber || phoneNumber.length < 9) {
@@ -71,7 +252,7 @@ export default function SungkuSendPage() {
       return;
     }
 
-    if (detectedOperator === 'unknown') {
+    if (paymentMethod === 'ussd' && detectedOperator === 'unknown') {
       setError('Opérateur non reconnu');
       return;
     }
@@ -81,38 +262,78 @@ export default function SungkuSendPage() {
       return;
     }
 
-    // Lancer la requête USSD
     setStep('sending');
     setLoading(true);
 
     try {
-      // Appel API réel
+      const userStr = localStorage.getItem('user');
+      const user = userStr ? JSON.parse(userStr) : null;
+
+      if (paymentMethod === 'notchpay') {
+        const normalizedPhone = getCameroonPhone(phoneNumber);
+        const response = await sendNotchPayTransfer({
+          amount: parseInt(amount),
+          currency: 'XAF',
+          channel: getNotchChannel(normalizedPhone),
+          description: note || `Sungku Send vers ${normalizedPhone}`,
+          reference: `MAPP_${Date.now()}`,
+          userId: user?.userId,
+          beneficiary_data: {
+            name: phoneNumber,
+            phone: normalizedPhone,
+            email: user?.email || 'support@sungku.app',
+          },
+          metadata: {
+            senderPhone,
+            recipientPhone: phoneNumber,
+            note,
+            miniApp: 'sungku-send',
+          },
+        });
+
+        setPendingNotchPayRef(response.reference);
+        if (response.status === 'completed') {
+          setPendingNotchPayRef(null);
+          setPaymentInfo('');
+          navigate('/miniapps/sungku-send/result', {
+            state: {
+              success: true,
+              transactionId: response.reference,
+              operator: 'NotchPay',
+              senderPhone,
+              phoneNumber: formatCameroonNumber(phoneNumber),
+              amount,
+              message: 'Transaction NotchPay confirmee',
+            }
+          });
+          return;
+        }
+        setPaymentInfo('Transfert NotchPay lance. Verifiez le statut dans quelques secondes.');
+        setStep('confirm');
+        setLoading(false);
+        return;
+      }
+
       const response = await initiateUSSD(
         phoneNumber,
         detectedOperator || 'unknown',
-        parseInt(amount)
+        parseInt(amount),
+        note || 'sungku-send',
+        user?.userId
       );
 
       if (response.success) {
-        // Naviguer vers la page de résultat avec succès
-        navigate('/miniapps/sungku-send/result', {
-          state: {
-            success: true,
-            transactionId: response.transactionId,
-            operator: detectedOperator,
-            phoneNumber: formatCameroonNumber(phoneNumber),
-            amount: amount,
-            message: `Transaction de ${amount} FCFA vers ${phoneNumber} réussie`,
-            code: response.code
-          }
-        });
+        const codeToDial = response.code || generateUSSDCode(detectedOperator || 'unknown', phoneNumber, parseInt(amount));
+        setPendingTransactionId(response.transactionId || null);
+        setPendingUSSDCode(codeToDial);
+        await launchUSSDDialer(codeToDial);
       } else {
         setError(response.message || 'Erreur lors du traitement');
         setStep('confirm');
         setLoading(false);
       }
     } catch (err) {
-      setError('Erreur lors de l\'envoi. Veuillez réessayer.');
+      setError(toUserErrorMessage(err, 'Erreur lors de l\'envoi. Veuillez reessayer.'));
       setStep('confirm');
       setLoading(false);
     }
@@ -129,7 +350,7 @@ export default function SungkuSendPage() {
         </button>
         <div>
           <h1 className="text-2xl font-bold">Sungku Send</h1>
-          <p className="text-sm text-emerald-100">Envoyez de l'argent via USSD</p>
+            <p className="text-sm text-emerald-100">Envoyez de l'argent via USSD ou NotchPay</p>
         </div>
       </div>
 
@@ -151,6 +372,38 @@ export default function SungkuSendPage() {
         {/* Form Step */}
         {step === 'form' && (
           <div className="space-y-4">
+            {!installed && (
+              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                <p className="text-sm text-yellow-800 mb-3">
+                  Cette mini-app n'est pas installée. Installez-la avant utilisation.
+                </p>
+                <button
+                  onClick={handleInstallMiniApp}
+                  disabled={installing}
+                  className="w-full bg-emerald-600 hover:bg-emerald-700 disabled:bg-emerald-300 text-white font-semibold py-2 rounded-lg"
+                >
+                  {installing ? 'Installation...' : 'Installer Sungku Send'}
+                </button>
+              </div>
+            )}
+
+            {/* Sender Phone Input */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Votre numéro (expéditeur)
+              </label>
+              <div className="flex-1 relative">
+                <Phone className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
+                <input
+                  type="tel"
+                  value={senderPhone}
+                  onChange={(e) => setSenderPhone(e.target.value.replace(/\D/g, ''))}
+                  placeholder="Votre numéro de téléphone"
+                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-gray-50"
+                />
+              </div>
+            </div>
+
             {/* Phone Input */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -168,10 +421,10 @@ export default function SungkuSendPage() {
                   />
                 </div>
                 <button
-                  onClick={() => setShowContactList(!showContactList)}
+                  onClick={handleOpenContacts}
                   className="px-4 py-3 bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200 transition"
                 >
-                  <Users className="w-5 h-5" />
+                  {contactsLoading ? <Loader className="w-5 h-5 animate-spin" /> : <Users className="w-5 h-5" />}
                 </button>
               </div>
 
@@ -182,7 +435,7 @@ export default function SungkuSendPage() {
                     <p className="text-sm font-medium text-gray-700">Sélectionner un contact</p>
                   </div>
                   <div className="divide-y max-h-48 overflow-y-auto">
-                    {mockContacts.map((contact, idx) => (
+                    {deviceContacts.map((contact, idx) => (
                       <button
                         key={idx}
                         onClick={() => selectContact(contact)}
@@ -190,13 +443,16 @@ export default function SungkuSendPage() {
                       >
                         <div>
                           <p className="font-medium text-gray-900">{contact.name}</p>
-                          <p className="text-xs text-gray-500">{contact.phone}</p>
+                          <p className="text-xs text-gray-500">{contact.phoneNumber}</p>
                         </div>
                         <span className="text-xs px-2 py-1 bg-emerald-100 text-emerald-700 rounded">
-                          {contact.operator.toUpperCase()}
+                          {detectOperator(contact.phoneNumber).toUpperCase()}
                         </span>
                       </button>
                     ))}
+                    {deviceContacts.length === 0 && (
+                      <p className="p-3 text-sm text-gray-500">Aucun contact disponible.</p>
+                    )}
                   </div>
                 </div>
               )}
@@ -241,6 +497,32 @@ export default function SungkuSendPage() {
               />
             </div>
 
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Canal de paiement</label>
+              <div className="grid grid-cols-2 gap-3">
+                <button
+                  onClick={() => setPaymentMethod('ussd')}
+                  className={`rounded-lg border p-3 text-left transition ${paymentMethod === 'ussd' ? 'border-emerald-500 bg-emerald-50' : 'border-gray-200 bg-white'}`}
+                >
+                  <div className="flex items-center gap-2 mb-1">
+                    <Smartphone className="w-4 h-4 text-emerald-600" />
+                    <span className="font-medium text-gray-900">USSD</span>
+                  </div>
+                  <p className="text-xs text-gray-500">Paiement mobile par code operateur</p>
+                </button>
+                <button
+                  onClick={() => setPaymentMethod('notchpay')}
+                  className={`rounded-lg border p-3 text-left transition ${paymentMethod === 'notchpay' ? 'border-emerald-500 bg-emerald-50' : 'border-gray-200 bg-white'}`}
+                >
+                  <div className="flex items-center gap-2 mb-1">
+                    <CreditCard className="w-4 h-4 text-emerald-600" />
+                    <span className="font-medium text-gray-900">NotchPay</span>
+                  </div>
+                  <p className="text-xs text-gray-500">Transfert direct wallet via API NotchPay</p>
+                </button>
+              </div>
+            </div>
+
             {/* Note */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -263,10 +545,16 @@ export default function SungkuSendPage() {
               </div>
             )}
 
+            {paymentInfo && (
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                <p className="text-sm text-blue-700">{paymentInfo}</p>
+              </div>
+            )}
+
             {/* Send Button */}
             <button
               onClick={handleSend}
-              disabled={!phoneNumber || !amount}
+              disabled={!phoneNumber || !amount || !installed}
               className="w-full bg-emerald-600 hover:bg-emerald-700 disabled:bg-gray-400 text-white font-bold py-3 rounded-lg transition"
             >
               Continuer
@@ -282,12 +570,16 @@ export default function SungkuSendPage() {
 
               <div className="space-y-3 py-4 border-t border-b border-gray-200">
                 <div className="flex justify-between">
+                  <span className="text-gray-600">Expéditeur:</span>
+                  <span className="font-medium">{formatCameroonNumber(senderPhone || 'votre numéro')}</span>
+                </div>
+                <div className="flex justify-between">
                   <span className="text-gray-600">Destinataire:</span>
                   <span className="font-medium">{formatCameroonNumber(phoneNumber)}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600">Opérateur:</span>
-                  <span className="font-medium text-emerald-600">{operatorConfig?.name}</span>
+                  <span className="font-medium text-emerald-600">{paymentMethod === 'notchpay' ? 'NotchPay' : operatorConfig?.name}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600">Montant:</span>
@@ -302,8 +594,19 @@ export default function SungkuSendPage() {
               </div>
 
               <p className="text-xs text-gray-500">
-                💡 Votre opérateur vous demandera de confirmer cette transaction via USSD
+                {paymentMethod === 'notchpay'
+                  ? 'Le transfert est envoye via API NotchPay puis verifie dans l application.'
+                  : 'Votre opérateur vous demandera de confirmer cette transaction via USSD'}
               </p>
+
+              {paymentMethod === 'notchpay' && pendingNotchPayRef && !loading && (
+                <button
+                  onClick={verifyPendingNotchPayTransfer}
+                  className="w-full px-4 py-3 border border-blue-200 text-blue-700 rounded-lg hover:bg-blue-50 transition font-medium"
+                >
+                  Verifier le transfert NotchPay
+                </button>
+              )}
 
               <div className="flex gap-2">
                 <button
@@ -323,10 +626,10 @@ export default function SungkuSendPage() {
                   {loading ? (
                     <>
                       <Loader className="w-5 h-5 animate-spin" />
-                      Envoi...
+                      {paymentMethod === 'notchpay' ? 'Envoi...' : 'Envoi...'}
                     </>
                   ) : (
-                    '✓ Confirmer'
+                    paymentMethod === 'notchpay' ? 'Envoyer via NotchPay' : '✓ Confirmer'
                   )}
                 </button>
               </div>
@@ -345,7 +648,9 @@ export default function SungkuSendPage() {
             </div>
             <p className="text-lg font-semibold text-gray-900">Transaction en cours...</p>
             <p className="text-sm text-gray-600 text-center">
-              Veuillez confirmer l'opération sur votre téléphone
+              {paymentMethod === 'notchpay'
+                ? 'Le transfert NotchPay est en cours de traitement'
+                : 'Veuillez confirmer l opération sur votre téléphone'}
             </p>
           </div>
         )}

@@ -72,7 +72,7 @@ export default function ProfileApps() {
       const availableApp = AVAILABLE_APPS.find(a => a.id === appId);
       if (!availableApp) return;
       
-      const app = await installMiniApp(user.userId, appId);
+      const app = await installMiniApp(user.userId, appId, user.phone);
       if (app) {
         const updated = [...installedApps, app];
         setInstalledApps(updated);

@@ -89,5 +89,266 @@
         ]
       }
     ]
+  },
+  "700171920": {
+    "conversations": [
+      {
+        "id": 1,
+        "name": "Marie Kamara",
+        "avatar": "MK",
+        "lastMessage": "Test message migration",
+        "time": "A l'instant",
+        "unread": 0,
+        "online": true,
+        "messages": [
+          {
+            "id": 1,
+            "sender": "other",
+            "text": "Salut ! Comment vas-tu ?",
+            "time": "13:10"
+          },
+          {
+            "id": 2,
+            "sender": "me",
+            "text": "Ça va bien merci ! Et toi ?",
+            "time": "13:12"
+          },
+          {
+            "id": 3,
+            "sender": "other",
+            "text": "Merci pour l'argent ! 🙏",
+            "time": "14:30"
+          },
+          {
+            "id": 4,
+            "sender": "me",
+            "text": "Test message migration",
+            "time": "20:45"
+          }
+        ]
+      },
+      {
+        "id": 2,
+        "name": "Jean Diallo",
+        "avatar": "JD",
+        "lastMessage": "Tu peux m'envoyer 5000 ?",
+        "time": "13:15",
+        "unread": 2,
+        "online": true,
+        "messages": [
+          {
+            "id": 1,
+            "sender": "other",
+            "text": "Salut !",
+            "time": "13:10"
+          },
+          {
+            "id": 2,
+            "sender": "other",
+            "text": "Tu peux m'envoyer 5000 ?",
+            "time": "13:15"
+          },
+          {
+            "id": 3,
+            "sender": "other",
+            "text": "J'ai besoin pour le transport",
+            "time": "13:15"
+          }
+        ]
+      },
+      {
+        "id": 3,
+        "name": "Fatou Sy",
+        "avatar": "FS",
+        "lastMessage": "D'accord, à demain",
+        "time": "Hier",
+        "unread": 0,
+        "online": false,
+        "messages": [
+          {
+            "id": 1,
+            "sender": "me",
+            "text": "Tu es libre demain ?",
+            "time": "15:30"
+          },
+          {
+            "id": 2,
+            "sender": "other",
+            "text": "D'accord, à demain",
+            "time": "Hier"
+          }
+        ]
+      }
+    ]
+  },
+  "+237696317217": {
+    "conversations": [
+      {
+        "id": 1,
+        "name": "Marie Kamara",
+        "avatar": "MK",
+        "lastMessage": "Merci pour l'argent ! 🙏",
+        "time": "14:30",
+        "unread": 0,
+        "online": true,
+        "messages": [
+          {
+            "id": 1,
+            "sender": "other",
+            "text": "Salut ! Comment vas-tu ?",
+            "time": "13:10"
+          },
+          {
+            "id": 2,
+            "sender": "me",
+            "text": "Ça va bien merci ! Et toi ?",
+            "time": "13:12"
+          },
+          {
+            "id": 3,
+            "sender": "other",
+            "text": "Merci pour l'argent ! 🙏",
+            "time": "14:30"
+          }
+        ]
+      },
+      {
+        "id": 2,
+        "name": "Jean Diallo",
+        "avatar": "JD",
+        "lastMessage": "Tu peux m'envoyer 5000 ?",
+        "time": "13:15",
+        "unread": 2,
+        "online": true,
+        "messages": [
+          {
+            "id": 1,
+            "sender": "other",
+            "text": "Salut !",
+            "time": "13:10"
+          },
+          {
+            "id": 2,
+            "sender": "other",
+            "text": "Tu peux m'envoyer 5000 ?",
+            "time": "13:15"
+          },
+          {
+            "id": 3,
+            "sender": "other",
+            "text": "J'ai besoin pour le transport",
+            "time": "13:15"
+          }
+        ]
+      },
+      {
+        "id": 3,
+        "name": "Fatou Sy",
+        "avatar": "FS",
+        "lastMessage": "D'accord, à demain",
+        "time": "Hier",
+        "unread": 0,
+        "online": false,
+        "messages": [
+          {
+            "id": 1,
+            "sender": "me",
+            "text": "Tu es libre demain ?",
+            "time": "15:30"
+          },
+          {
+            "id": 2,
+            "sender": "other",
+            "text": "D'accord, à demain",
+            "time": "Hier"
+          }
+        ]
+      }
+    ]
+  },
+  "+237678758976": {
+    "conversations": [
+      {
+        "id": 1,
+        "name": "Marie Kamara",
+        "avatar": "MK",
+        "lastMessage": "Merci pour l'argent ! 🙏",
+        "time": "14:30",
+        "unread": 0,
+        "online": true,
+        "messages": [
+          {
+            "id": 1,
+            "sender": "other",
+            "text": "Salut ! Comment vas-tu ?",
+            "time": "13:10"
+          },
+          {
+            "id": 2,
+            "sender": "me",
+            "text": "Ça va bien merci ! Et toi ?",
+            "time": "13:12"
+          },
+          {
+            "id": 3,
+            "sender": "other",
+            "text": "Merci pour l'argent ! 🙏",
+            "time": "14:30"
+          }
+        ]
+      },
+      {
+        "id": 2,
+        "name": "Jean Diallo",
+        "avatar": "JD",
+        "lastMessage": "Tu peux m'envoyer 5000 ?",
+        "time": "13:15",
+        "unread": 2,
+        "online": true,
+        "messages": [
+          {
+            "id": 1,
+            "sender": "other",
+            "text": "Salut !",
+            "time": "13:10"
+          },
+          {
+            "id": 2,
+            "sender": "other",
+            "text": "Tu peux m'envoyer 5000 ?",
+            "time": "13:15"
+          },
+          {
+            "id": 3,
+            "sender": "other",
+            "text": "J'ai besoin pour le transport",
+            "time": "13:15"
+          }
+        ]
+      },
+      {
+        "id": 3,
+        "name": "Fatou Sy",
+        "avatar": "FS",
+        "lastMessage": "D'accord, à demain",
+        "time": "Hier",
+        "unread": 0,
+        "online": false,
+        "messages": [
+          {
+            "id": 1,
+            "sender": "me",
+            "text": "Tu es libre demain ?",
+            "time": "15:30"
+          },
+          {
+            "id": 2,
+            "sender": "other",
+            "text": "D'accord, à demain",
+            "time": "Hier"
+          }
+        ]
+      }
+    ]
   }
 }

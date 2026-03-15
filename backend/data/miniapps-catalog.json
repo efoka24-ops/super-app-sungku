@@ -1,15 +1,109 @@
 [
   {
+    "id": "mini-app-test-1773177359342",
+    "name": "Mini App Test",
+    "category": "commerce",
+    "description": "Test backoffice",
+    "published": true,
+    "featured": false,
+    "installations": 0,
+    "rating": 0,
+    "uploadedAt": "2026-03-10",
+    "fileName": "mini-app-test.apk",
+    "fileSize": "4.2 MB"
+  },
+  {
     "id": "sungku-send",
     "name": "Sungku Send",
     "category": "finance",
     "description": "Envoyez de l'argent par USSD facilement",
     "published": true,
     "featured": true,
-    "installations": 0,
+    "installations": 5,
     "rating": 0,
     "uploadedAt": "2026-03-09",
     "fileName": "sungku-send.apk",
-    "fileSize": 5.2
+    "fileSize": 5.2,
+    "installedUsers": [
+      "691227142",
+      "+237696317215",
+      "+237678758976",
+      "+237696317217",
+      "237678758976"
+    ],
+    "installedPhones": [
+      "+237696317216",
+      "+237696317215",
+      "+237678758976",
+      "+237696317217"
+    ],
+    "uniqueUsers": 5,
+    "uniquePhones": 4,
+    "lastInstalledAt": "2026-03-15T09:45:07.081Z",
+    "installEvents": [
+      {
+        "at": "2026-03-11T13:33:04.542Z",
+        "userId": "+237696317215",
+        "phone": "+237696317215",
+        "deviceMeta": {
+          "userAgent": "Mozilla/5.0 (Linux; Android 13; SM-G981B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Mobile Safari/537.36 Edg/145.0.0.0",
+          "platform": "Win32",
+          "language": "fr",
+          "screenWidth": "412",
+          "screenHeight": "915",
+          "deviceMemory": "8",
+          "connection": "4g",
+          "installTime": "2026-03-11T13:33:01.517Z"
+        }
+      },
+      {
+        "at": "2026-03-14T23:55:55.629Z",
+        "userId": "+237678758976",
+        "phone": "+237678758976",
+        "deviceMeta": {
+          "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36 Edg/145.0.0.0",
+          "platform": "Win32",
+          "language": "fr",
+          "screenWidth": "1536",
+          "screenHeight": "864",
+          "deviceMemory": "8",
+          "connection": "3g",
+          "installTime": "2026-03-14T23:55:52.567Z"
+        }
+      },
+      {
+        "at": "2026-03-15T09:32:23.881Z",
+        "userId": "+237696317217",
+        "phone": "+237696317217",
+        "deviceMeta": {
+          "userAgent": "Mozilla/5.0 (Linux; Android 13; SM-G981B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Mobile Safari/537.36 Edg/145.0.0.0",
+          "platform": "Win32",
+          "language": "fr",
+          "screenWidth": "412",
+          "screenHeight": "915",
+          "deviceMemory": "8",
+          "connection": "4g",
+          "installTime": "2026-03-15T09:32:23.617Z",
+          "latitude": "4.075674",
+          "longitude": "9.747629",
+          "locationAccuracy": "241"
+        }
+      },
+      {
+        "at": "2026-03-15T09:45:07.081Z",
+        "userId": "237678758976",
+        "phone": "+237678758976",
+        "deviceMeta": {
+          "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36 Edg/145.0.0.0",
+          "platform": "Win32",
+          "language": "fr",
+          "screenWidth": "1536",
+          "screenHeight": "864",
+          "deviceMemory": "8",
+          "connection": "3g",
+          "installTime": "2026-03-15T09:45:04.064Z"
+        }
+      }
+    ]
   }
 ]

@@ -23,7 +23,12 @@ router.post("/initiate", async (req, res) => {
   const expiresAt     = new Date(Date.now() + 5 * 60 * 1000).toISOString();
   const txn = { transactionId, phoneNumber, operator, amount, description: description || "payment", userId: userId || "anonymous", code, status: "pending", initiatedAt: now, expiresAt, completedAt: null };
 
-  if (db) await db.from("ussd_transactions").insert({ transaction_id: transactionId, phone_number: phoneNumber, operator, amount, description: txn.description, user_id: txn.userId, code, status: "pending", initiated_at: now, expires_at: expiresAt }).catch(e => console.error("Supabase ussd:", e.message));
+  if (db) {
+    const { error } = await db.from("ussd_transactions").insert({ transaction_id: transactionId, phone_number: phoneNumber, operator, amount, description: txn.description, user_id: txn.userId, code, status: "pending", initiated_at: now, expires_at: expiresAt });
+    if (error) {
+      console.error("Supabase ussd:", error.message);
+    }
+  }
   const store = readCollection("ussd-transactions.json", {});
   store[transactionId] = txn;
   writeCollection("ussd-transactions.json", store);
@@ -61,7 +66,9 @@ router.get("/history/:userId", async (req, res) => {
 router.post("/cancel/:transactionId", async (req, res) => {
   const { transactionId } = req.params;
   const now = nowIso();
-  if (db) await db.from("ussd_transactions").update({ status: "cancelled", completed_at: now }).eq("transaction_id", transactionId).catch(() => {});
+  if (db) {
+    await db.from("ussd_transactions").update({ status: "cancelled", completed_at: now }).eq("transaction_id", transactionId);
+  }
   const store = readCollection("ussd-transactions.json", {});
   if (!store[transactionId]) return res.status(404).json({ success: false, message: "Transaction not found" });
   if (store[transactionId].status !== "pending") return res.status(400).json({ success: false, message: "Can only cancel pending transactions" });
@@ -75,7 +82,9 @@ router.post("/simulate-success/:transactionId", async (req, res) => {
   const { transactionId } = req.params;
   const { userId } = req.body;
   const now = nowIso();
-  if (db) await db.from("ussd_transactions").update({ status: "completed", completed_at: now }).eq("transaction_id", transactionId).catch(() => {});
+  if (db) {
+    await db.from("ussd_transactions").update({ status: "completed", completed_at: now }).eq("transaction_id", transactionId);
+  }
   const store = readCollection("ussd-transactions.json", {});
   const txn   = store[transactionId];
   if (!txn) return res.status(404).json({ success: false, message: "Transaction not found" });
@@ -88,7 +97,9 @@ router.post("/simulate-success/:transactionId", async (req, res) => {
     stats[uid].transfers = (stats[uid].transfers || 0) + 1;
     stats[uid].updatedAt = now;
     writeCollection("profile-stats.json", stats);
-    if (db) await db.from("profile_stats").upsert({ user_id: uid, transfers: stats[uid].transfers, updated_at: now }, { onConflict: "user_id" }).catch(() => {});
+    if (db) {
+      await db.from("profile_stats").upsert({ user_id: uid, transfers: stats[uid].transfers, updated_at: now }, { onConflict: "user_id" });
+    }
   }
   res.json({ success: true, message: "Transaction simulée complète", transactionId, status: "completed" });
 });
@@ -97,12 +108,61 @@ router.post("/simulate-failure/:transactionId", async (req, res) => {
   const { transactionId } = req.params;
   const { reason = "Solde insuffisant" } = req.body;
   const now = nowIso();
-  if (db) await db.from("ussd_transactions").update({ status: "failed", failure_reason: reason, completed_at: now }).eq("transaction_id", transactionId).catch(() => {});
+  if (db) {
+    await db.from("ussd_transactions").update({ status: "failed", failure_reason: reason, completed_at: now }).eq("transaction_id", transactionId);
+  }
   const store = readCollection("ussd-transactions.json", {});
   if (!store[transactionId]) return res.status(404).json({ success: false, message: "Transaction not found" });
   store[transactionId].status = "failed"; store[transactionId].failureReason = reason; store[transactionId].completedAt = now;
   writeCollection("ussd-transactions.json", store);
   res.json({ success: false, message: reason, transactionId, status: "failed" });
+});
+
+// Confirm transaction outcome from app after user validates USSD flow
+router.post("/confirm/:transactionId", async (req, res) => {
+  const { transactionId } = req.params;
+  const { success, reason = "Échec de validation USSD", userId } = req.body || {};
+  const now = nowIso();
+  const nextStatus = success ? "completed" : "failed";
+
+  if (db) {
+    const payload = success
+      ? { status: "completed", completed_at: now }
+      : { status: "failed", failure_reason: reason, completed_at: now };
+    await db.from("ussd_transactions").update(payload).eq("transaction_id", transactionId);
+  }
+
+  const store = readCollection("ussd-transactions.json", {});
+  const txn = store[transactionId];
+  if (!txn) {
+    return res.status(404).json({ success: false, message: "Transaction not found" });
+  }
+
+  txn.status = nextStatus;
+  txn.completedAt = now;
+  if (!success) txn.failureReason = reason;
+  writeCollection("ussd-transactions.json", store);
+
+  if (success) {
+    const uid = userId || txn.userId;
+    if (uid) {
+      const stats = readCollection("profile-stats.json", {});
+      if (!stats[uid]) stats[uid] = { userId: uid, transfers: 0, contacts: 0, miniApps: 0, balance: 0 };
+      stats[uid].transfers = (stats[uid].transfers || 0) + 1;
+      stats[uid].updatedAt = now;
+      writeCollection("profile-stats.json", stats);
+      if (db) {
+        await db.from("profile_stats").upsert({ user_id: uid, transfers: stats[uid].transfers, updated_at: now }, { onConflict: "user_id" });
+      }
+    }
+  }
+
+  return res.json({
+    success: Boolean(success),
+    transactionId,
+    status: nextStatus,
+    message: success ? "Transaction confirmée" : reason
+  });
 });
 
 export default router;

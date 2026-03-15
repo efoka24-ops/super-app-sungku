@@ -1,1 +1,31 @@
-{}
+{
+  "237690999888": [
+    {
+      "id": "contact_1773562349515",
+      "userId": "237690999888",
+      "name": "Marie Test",
+      "phoneNumber": "237650000001",
+      "email": "marie@t.com",
+      "addedAt": "2026-03-15T08:12:29.515Z"
+    }
+  ],
+  "user-fs-test-001": [
+    {
+      "id": "contact_1773563353030",
+      "userId": "user-fs-test-001",
+      "name": "Paul Test",
+      "phoneNumber": "237670000099",
+      "email": "paul@t.cm",
+      "addedAt": "2026-03-15T08:29:13.030Z"
+    }
+  ],
+  "user-fs-fix-001": [
+    {
+      "id": "contact_1773563613509",
+      "userId": "user-fs-fix-001",
+      "name": "Alice Mbah",
+      "phoneNumber": "+237699000111",
+      "addedAt": "2026-03-15T08:33:33.509Z"
+    }
+  ]
+}

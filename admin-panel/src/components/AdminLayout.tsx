@@ -30,6 +30,7 @@ export default function AdminLayout({ children, title, showBackButton = false }:
     { label: 'Utilisateurs', path: '/users', icon: '👥' },
     { label: 'Mini-Apps', path: '/miniapps', icon: '📱' },
     { label: 'Analytiques', path: '/analytics', icon: '📈' },
+    { label: 'Comms', path: '/comms', icon: '📨' },
   ];
 
   return (
@@ -151,6 +152,7 @@ export default function AdminLayout({ children, title, showBackButton = false }:
                 <li><button onClick={() => navigate('/dashboard')} className="hover:text-emerald-600">Dashboard</button></li>
                 <li><button onClick={() => navigate('/users')} className="hover:text-emerald-600">Utilisateurs</button></li>
                 <li><button onClick={() => navigate('/miniapps')} className="hover:text-emerald-600">Mini-Apps</button></li>
+                <li><button onClick={() => navigate('/comms')} className="hover:text-emerald-600">Comms</button></li>
               </ul>
             </div>
             <div>

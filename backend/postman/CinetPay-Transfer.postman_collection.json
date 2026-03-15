@@ -1,0 +1,220 @@
+{
+  "info": {
+    "_postman_id": "4f42926f-1f12-4f31-b6cb-f2d718d9b341",
+    "name": "Sungku - CinetPay Transfer API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "https://client.cinetpay.com"
+    },
+    {
+      "key": "apikey",
+      "value": "111432960866b70e8ec1bf48.35330394"
+    },
+    {
+      "key": "password_or_secret",
+      "value": "149298008966b70f1a65bb68.96559835"
+    },
+    {
+      "key": "token",
+      "value": ""
+    },
+    {
+      "key": "transaction_id",
+      "value": "TRF-{{$timestamp}}"
+    },
+    {
+      "key": "notify_url",
+      "value": "https://your-public-backend.example.com/api/cinetpay-transfer/notify"
+    },
+    {
+      "key": "prefix",
+      "value": "237"
+    },
+    {
+      "key": "phone",
+      "value": "690000000"
+    },
+    {
+      "key": "amount",
+      "value": "500"
+    }
+  ],
+  "item": [
+    {
+      "name": "1. Login",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/x-www-form-urlencoded",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "urlencoded",
+          "urlencoded": [
+            {
+              "key": "apikey",
+              "value": "{{apikey}}",
+              "type": "text"
+            },
+            {
+              "key": "password",
+              "value": "{{password_or_secret}}",
+              "type": "text"
+            }
+          ]
+        },
+        "url": {
+          "raw": "{{base_url}}/v1/auth/login",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "v1",
+            "auth",
+            "login"
+          ]
+        },
+        "description": "Authentifie l'application sur l'API transfert. Si CinetPay attend un vrai mot de passe back-office au lieu de la cle secrete, remplacez password_or_secret dans les variables de collection."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const response = pm.response.json();",
+              "const token = response.token || response.data?.token || response.access_token;",
+              "if (token) pm.collectionVariables.set('token', token);"
+            ]
+          }
+        }
+      ],
+      "response": []
+    },
+    {
+      "name": "2. Ajouter un contact",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/x-www-form-urlencoded",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "urlencoded",
+          "urlencoded": [
+            {
+              "key": "data",
+              "value": "[{\"prefix\":\"{{prefix}}\",\"phone\":\"{{phone}}\",\"name\":\"Client\",\"surname\":\"Sungku\",\"email\":\"client@example.com\"}]",
+              "type": "text"
+            }
+          ]
+        },
+        "url": {
+          "raw": "{{base_url}}/v1/transfer/contact?token={{token}}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "v1",
+            "transfer",
+            "contact"
+          ],
+          "query": [
+            {
+              "key": "token",
+              "value": "{{token}}"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "3. Envoyer de l'argent",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/x-www-form-urlencoded",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "urlencoded",
+          "urlencoded": [
+            {
+              "key": "data",
+              "value": "[{\"amount\":\"{{amount}}\",\"phone\":\"{{phone}}\",\"prefix\":\"{{prefix}}\",\"notify_url\":\"{{notify_url}}\"}]",
+              "type": "text"
+            }
+          ]
+        },
+        "url": {
+          "raw": "{{base_url}}/v1/transfer/money/send/contact?token={{token}}&transaction_id={{transaction_id}}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "v1",
+            "transfer",
+            "money",
+            "send",
+            "contact"
+          ],
+          "query": [
+            {
+              "key": "token",
+              "value": "{{token}}"
+            },
+            {
+              "key": "transaction_id",
+              "value": "{{transaction_id}}"
+            }
+          ]
+        },
+        "description": "Declenche un transfert sortant vers un contact deja connu de CinetPay. L'adresse IP du serveur appelant doit etre whitelistée sur votre compte CinetPay."
+      },
+      "response": []
+    },
+    {
+      "name": "4. Verifier statut transfert",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/v1/transfer/check/money?token={{token}}&transaction_id={{transaction_id}}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "v1",
+            "transfer",
+            "check",
+            "money"
+          ],
+          "query": [
+            {
+              "key": "token",
+              "value": "{{token}}"
+            },
+            {
+              "key": "transaction_id",
+              "value": "{{transaction_id}}"
+            }
+          ]
+        }
+      },
+      "response": []
+    }
+  ]
+}

@@ -1,12 +1,14 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'com.sungku.superapp',
+  appId: 'com.sungku.app',
   appName: 'Sungku',
   webDir: 'dist',
   bundledWebRuntime: false,
   server: {
-    androidScheme: 'https',
+    // Use cleartext/http inside Android WebView for local/dev API compatibility.
+    androidScheme: 'http',
+    cleartext: true,
   },
 };
 
