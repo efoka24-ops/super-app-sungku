@@ -1,4 +1,4 @@
-package com.sungku.app;
+package com.sungku.superapp;
 
 import com.getcapacitor.BridgeActivity;
 

@@ -53,7 +53,7 @@ export async function updateUserStatus(userId: string, status: string): Promise<
  */
 export async function getUserStats() {
   try {
-    const response = await fetch(`${ADMIN_API_BASE_URL}/dashboard-stats`);
+    const response = await fetch(`${ADMIN_API_BASE_URL}/dashboard`);
     if (!response.ok) throw new Error('Failed to fetch stats');
     
     return await response.json();

@@ -14,9 +14,7 @@
     "mobile:build": "npm run build ; npx cap sync android"
   },
   "dependencies": {
-    "@capacitor-community/contacts": "^7.1.0",
     "@capacitor/core": "^7.1.0",
-    "@capacitor/push-notifications": "7.0.6",
     "@radix-ui/react-accordion": "^1.2.11",
     "@radix-ui/react-alert-dialog": "^1.1.14",
     "@radix-ui/react-aspect-ratio": "^1.1.7",
@@ -69,7 +67,6 @@
     "@capacitor/android": "^7.1.0",
     "@capacitor/cli": "^7.1.0",
     "@tailwindcss/vite": "^4.1.13",
-    "@types/qrcode": "^1.5.6",
     "@types/react": "^18.2.0",
     "@types/react-dom": "^18.2.0",
     "@typescript-eslint/eslint-plugin": "^7.0.0",

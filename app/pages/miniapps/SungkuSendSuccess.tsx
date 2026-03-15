@@ -3,73 +3,6 @@ import { CheckCircle2, Download, Share2, Home, ArrowRight } from "lucide-react";
 import { Button } from "../../components/ui/button";
 import { motion } from "motion/react";
 
-function downloadPDFReceipt(data: {
-  amount: string;
-  recipient: string;
-  phone: string;
-  method: string;
-  transactionId: string;
-  date: string;
-}) {
-  const html = `<!DOCTYPE html>
-<html lang="fr">
-<head>
-<meta charset="utf-8"/>
-<title>Reçu Sungku - ${data.transactionId}</title>
-<style>
-  body { font-family: Arial, sans-serif; max-width: 400px; margin: 40px auto; color: #111; }
-  .header { background: #059669; color: white; padding: 24px; text-align: center; border-radius: 12px 12px 0 0; }
-  .header h1 { margin: 0; font-size: 24px; }
-  .header p { margin: 4px 0 0; opacity: 0.85; }
-  .body { border: 1px solid #e5e7eb; border-top: none; border-radius: 0 0 12px 12px; padding: 24px; }
-  .amount-row { text-align: center; margin: 16px 0 24px; }
-  .amount-row .val { font-size: 36px; font-weight: bold; }
-  .row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #f3f4f6; font-size: 14px; }
-  .row:last-child { border-bottom: none; }
-  .label { color: #6b7280; }
-  .value { font-weight: 600; }
-  .footer { text-align: center; margin-top: 24px; font-size: 12px; color: #9ca3af; }
-  @media print { @page { size: A5; margin: 10mm; } }
-</style>
-</head>
-<body>
-<div class="header">
-  <h1>✓ Transfert réussi</h1>
-  <p>Reçu de transaction Sungku</p>
-</div>
-<div class="body">
-  <div class="amount-row">
-    <div class="label">Montant envoyé</div>
-    <div class="val">${parseInt(data.amount).toLocaleString("fr-FR")} FCFA</div>
-  </div>
-  <div class="row"><span class="label">Destinataire</span><span class="value">${data.recipient}</span></div>
-  <div class="row"><span class="label">Numéro</span><span class="value">${data.phone}</span></div>
-  <div class="row"><span class="label">Méthode</span><span class="value">${data.method}</span></div>
-  <div class="row"><span class="label">ID Transaction</span><span class="value">${data.transactionId}</span></div>
-  <div class="row"><span class="label">Date</span><span class="value">${data.date}</span></div>
-  <div class="row"><span class="label">Frais</span><span class="value" style="color:#059669;">0 FCFA</span></div>
-</div>
-<div class="footer">Sungku App &mdash; Conservez ce reçu comme justificatif</div>
-</body>
-</html>`;
-
-  const blob = new Blob([html], { type: "text/html" });
-  const url = URL.createObjectURL(blob);
-  const win = window.open(url, "_blank");
-  if (win) {
-    win.onload = () => {
-      win.print();
-    };
-  } else {
-    // Fallback: direct download as HTML
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `recu-sungku-${data.transactionId}.html`;
-    a.click();
-  }
-  setTimeout(() => URL.revokeObjectURL(url), 10000);
-}
-
 export default function SungkuSendSuccess() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -176,24 +109,13 @@ export default function SungkuSendSuccess() {
           <Button
             variant="outline"
             className="h-12 rounded-xl border-2 border-gray-200 hover:bg-gray-50"
-            onClick={() =>
-              downloadPDFReceipt({ amount, recipient, phone, method, transactionId, date })
-            }
           >
             <Download className="w-4 h-4 mr-2" />
-            Reçu PDF
+            Reçu
           </Button>
           <Button
             variant="outline"
             className="h-12 rounded-xl border-2 border-gray-200 hover:bg-gray-50"
-            onClick={() => {
-              if (navigator.share) {
-                navigator.share({
-                  title: "Reçu Sungku",
-                  text: `Transfert de ${parseInt(amount).toLocaleString()} FCFA à ${recipient} (${phone}) via ${method}. ID: ${transactionId}`,
-                });
-              }
-            }}
           >
             <Share2 className="w-4 h-4 mr-2" />
             Partager

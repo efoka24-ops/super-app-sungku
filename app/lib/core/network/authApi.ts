@@ -1,5 +1,3 @@
-import { parseJsonSafe, toUserErrorMessage } from "./errorMessages";
-
 const rawApiUrl =
   import.meta.env.DEV
     ? "/api"
@@ -17,7 +15,7 @@ interface SignupRequest {
 
 interface SignupResponse {
   userId: string;
-  otp?: string;
+  otp: string;
   message: string;
 }
 
@@ -43,19 +41,15 @@ export async function signup(data: SignupRequest): Promise<SignupResponse> {
       body: JSON.stringify(data),
     });
 
-    const payload = await parseJsonSafe(response);
-
     if (!response.ok) {
-      const message =
-        typeof payload.message === "string" && payload.message.trim().length > 0
-          ? payload.message
-          : `Erreur ${response.status} sur ${API_BASE}/auth/signup`;
-      throw new Error(message);
+      const error = await response.json();
+      throw new Error(error.message || "Signup failed");
     }
 
-    return payload as SignupResponse;
+    return await response.json();
   } catch (error) {
-    throw new Error(toUserErrorMessage(error, "Inscription impossible pour le moment."));
+    console.error("Signup error:", error);
+    throw new Error(`Connexion backend impossible (${API_BASE}/auth/signup)`);
   }
 }
 
@@ -70,19 +64,15 @@ export async function verifyOtp(data: VerifyOtpRequest): Promise<VerifyOtpRespon
       body: JSON.stringify(data),
     });
 
-    const payload = await parseJsonSafe(response);
-
     if (!response.ok) {
-      const message =
-        typeof payload.message === "string" && payload.message.trim().length > 0
-          ? payload.message
-          : `Erreur ${response.status} sur ${API_BASE}/auth/verify-otp`;
-      throw new Error(message);
+      const error = await response.json();
+      throw new Error(error.message || "Verification failed");
     }
 
-    return payload as VerifyOtpResponse;
+    return await response.json();
   } catch (error) {
-    throw new Error(toUserErrorMessage(error, "Verification du code impossible."));
+    console.error("Verify OTP error:", error);
+    throw error;
   }
 }
 
@@ -97,18 +87,14 @@ export async function signin(login: string, password: string) {
       body: JSON.stringify({ login, password }),
     });
 
-    const payload = await parseJsonSafe(response);
-
     if (!response.ok) {
-      const message =
-        typeof payload.message === "string" && payload.message.trim().length > 0
-          ? payload.message
-          : `Erreur ${response.status} sur ${API_BASE}/auth/signin`;
-      throw new Error(message);
+      const error = await response.json();
+      throw new Error(error.message || "Signin failed");
     }
 
-    return payload;
+    return await response.json();
   } catch (error) {
-    throw new Error(toUserErrorMessage(error, "Connexion impossible pour le moment."));
+    console.error("Signin error:", error);
+    throw error;
   }
 }

@@ -29,66 +29,23 @@ export async function fetchInstalledMiniApps(userId: string): Promise<MiniApp[]>
   }
 }
 
-/** Collect device info and geolocation for KPI */
-async function collectDeviceMeta(): Promise<Record<string, string>> {
-  const meta: Record<string, string> = {
-    userAgent: navigator.userAgent,
-    platform: navigator.platform,
-    language: navigator.language,
-    screenWidth: String(screen.width),
-    screenHeight: String(screen.height),
-    deviceMemory: String((navigator as any).deviceMemory ?? ""),
-    connection: (navigator as any).connection?.effectiveType ?? "",
-    installTime: new Date().toISOString(),
-  };
-  try {
-    await new Promise<void>((resolve) => {
-      navigator.geolocation.getCurrentPosition(
-        (pos) => {
-          meta.latitude = String(pos.coords.latitude);
-          meta.longitude = String(pos.coords.longitude);
-          meta.locationAccuracy = String(pos.coords.accuracy);
-          resolve();
-        },
-        () => resolve(),
-        { timeout: 3000 }
-      );
-    });
-  } catch {
-    // location optional
-  }
-  return meta;
-}
-
 /**
- * Install a mini-app and send device/location KPI
+ * Install a mini-app
  */
 export async function installMiniApp(
   userId: string,
-  appId: string,
-  phone?: string
+  appId: string
 ): Promise<MiniApp | null> {
-  const deviceMeta = await collectDeviceMeta();
   try {
     const response = await fetch(`${API_BASE}/miniapps/${userId}/install`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ appId, phone, deviceMeta }),
+      body: JSON.stringify({ appId }),
     });
     if (!response.ok) {
       throw new Error(`Failed to install mini-app: ${response.statusText}`);
     }
     const data = await response.json();
-    // Keep localStorage in sync for profile stats
-    try {
-      const current: string[] = JSON.parse(localStorage.getItem("installedApps") || "[]");
-      if (!current.includes(appId)) {
-        current.push(appId);
-        localStorage.setItem("installedApps", JSON.stringify(current));
-      }
-    } catch {
-      // ignore
-    }
     return data.miniapp;
   } catch (error) {
     console.error("Error installing mini-app:", error);

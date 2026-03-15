@@ -1,12 +1,4 @@
 {
-  "691227142": {
-    "userId": "691227142",
-    "transfers": 1,
-    "contacts": 0,
-    "miniApps": 0,
-    "balance": 0,
-    "updatedAt": "2026-03-10T21:55:27.290Z"
-  },
   "691227149": {
     "userId": "691227149",
     "firstName": "FOKA",
@@ -34,47 +26,5 @@
     "contacts": 7,
     "miniApps": 0,
     "updatedAt": "2026-03-09T14:02:11.229Z"
-  },
-  "+237656298199": {
-    "transfers": 16,
-    "contacts": 16,
-    "miniApps": 0,
-    "updatedAt": "2026-03-09T19:47:15.242Z"
-  },
-  "+237656298194": {
-    "transfers": 11,
-    "contacts": 11,
-    "miniApps": 0,
-    "updatedAt": "2026-03-09T20:40:55.813Z"
-  },
-  "+237696317216": {
-    "transfers": 0,
-    "contacts": 0,
-    "miniApps": 0,
-    "updatedAt": "2026-03-10T20:25:56.769Z"
-  },
-  "+237696317215": {
-    "transfers": 2,
-    "contacts": 0,
-    "miniApps": 0,
-    "updatedAt": "2026-03-11T13:50:27.573Z"
-  },
-  "+237696317217": {
-    "transfers": 0,
-    "contacts": 0,
-    "miniApps": 0,
-    "updatedAt": "2026-03-11T13:52:41.251Z"
-  },
-  "+237678758976": {
-    "transfers": 0,
-    "contacts": 0,
-    "miniApps": 0,
-    "updatedAt": "2026-03-14T23:54:32.296Z"
-  },
-  "237678758976": {
-    "transfers": 0,
-    "contacts": 0,
-    "miniApps": 0,
-    "updatedAt": "2026-03-15T09:44:53.805Z"
   }
 }

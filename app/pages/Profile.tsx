@@ -125,21 +125,9 @@ export default function Profile() {
 
         <div className="flex items-center gap-4">
           <div className="relative">
-            {(() => {
-              const userId = user?.phone || user?.email || `${user?.firstName}-${user?.lastName}`;
-              const avatarSrc = localStorage.getItem(`avatar_${userId}`);
-              return avatarSrc ? (
-                <img
-                  src={avatarSrc}
-                  alt="Photo de profil"
-                  className="w-20 h-20 bg-white rounded-full object-cover border-2 border-white"
-                />
-              ) : (
-                <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center">
-                  <User className="w-10 h-10 text-emerald-500" />
-                </div>
-              );
-            })()}
+            <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center">
+              <User className="w-10 h-10 text-emerald-500" />
+            </div>
             <button 
               onClick={() => navigate("/profile/info")}
               className="absolute bottom-0 right-0 w-7 h-7 bg-emerald-500 rounded-full flex items-center justify-center border-2 border-white hover:bg-emerald-600 transition-colors"

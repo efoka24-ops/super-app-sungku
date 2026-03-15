@@ -6,7 +6,7 @@ import { Label } from "../components/ui/label";
 import { ArrowLeft, User, Phone, Mail, Lock, Eye, EyeOff, Check, Loader } from "lucide-react";
 import { motion } from "motion/react";
 import { signup } from "../lib/core/network/authApi";
-import { parseJsonSafe, toUserErrorMessage } from "../lib/core/network/errorMessages";
+import SmsService from "../lib/core/network/smsService";
 
 const rawApiUrl =
   (import.meta.env.VITE_API_URL as string | undefined) ||
@@ -65,36 +65,46 @@ export default function SignUp() {
         password: formData.password,
       });
 
-      // Demander au backend d'envoyer le code OTP 4 chiffres par SMS
-      const otpRes = await fetch(`${API_BASE_URL}/api/otp/send`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ phone: formData.phone }),
-      });
-      const otpData = await parseJsonSafe(otpRes);
+      // Generate OTP
+      const otp = SmsService.generateOtp(6);
+      
+      // Format phone number for SMS
+      const formattedPhone = SmsService.formatPhoneNumber(formData.phone);
 
-      // En cas d'erreur d'envoi, on prévient mais on continue
-      // (l'utilisateur peut renvoyer depuis l'écran de vérification)
-      if (!otpRes.ok) {
-        const otpWarning =
-          typeof otpData.message === "string" && otpData.message.trim().length > 0
-            ? otpData.message
-            : "Code non envoye pour le moment. Vous pourrez renvoyer depuis l'ecran suivant.";
-        setError(toUserErrorMessage(new Error(otpWarning), "Envoi du code temporairement indisponible."));
+      // Send OTP via SMS (non-blocking - essai d'envoi)
+      try {
+        const smsResult = await fetch(`${API_BASE_URL}/api/sms/send-otp`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            phone: formattedPhone,
+            code: otp,
+            provider: 'afrimotech'
+          })
+        });
+        
+        if (smsResult.ok) {
+          console.log('✓ OTP envoyé par SMS');
+        } else {
+          console.warn('SMS send failed, continuing with verification');
+        }
+      } catch (smsError) {
+        console.warn('SMS service unavailable, continuing:', smsError);
       }
 
-      // NE PAS mettre l'OTP dans le state — il reste côté backend
+      // Navigate to verification page with userId and OTP
       navigate("/verify", {
         state: {
-          userId:     result.userId,
-          firstName:  formData.firstName,
-          lastName:   formData.lastName,
-          phone:      formData.phone,
-          email:      formData.email,
+          userId: result.userId,
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          phone: formData.phone,
+          email: formData.email,
+          otp: otp // Pass the generated OTP for display
         },
       });
     } catch (err) {
-      setError(toUserErrorMessage(err, "Erreur d'inscription"));
+      setError(err instanceof Error ? err.message : "Erreur d'inscription");
       setLoading(false);
     }
   };

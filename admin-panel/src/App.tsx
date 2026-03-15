@@ -5,8 +5,6 @@ import DashboardPage from './pages/DashboardPage';
 import UsersPage from './pages/UsersPage';
 import MiniAppsPage from './pages/MiniAppsPage';
 import AnalyticsPage from './pages/AnalyticsPage';
-import UserDetailPage from './pages/UserDetailPage';
-import CommsPage from './pages/CommsPage';
 import './index.css';
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -51,22 +49,6 @@ const router = createBrowserRouter([
     element: (
       <ProtectedRoute>
         <AnalyticsPage />
-      </ProtectedRoute>
-    )
-  },
-  {
-    path: '/users/:userId',
-    element: (
-      <ProtectedRoute>
-        <UserDetailPage />
-      </ProtectedRoute>
-    )
-  },
-  {
-    path: '/comms',
-    element: (
-      <ProtectedRoute>
-        <CommsPage />
       </ProtectedRoute>
     )
   }

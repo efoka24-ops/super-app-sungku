@@ -14,16 +14,7 @@ import Profile from "./pages/Profile";
 import SendMoney from "./lib/features/payments/pages/SendMoney";
 import ReceiveMoney from "./lib/features/payments/pages/ReceiveMoney";
 import ScanQR from "./lib/features/payments/pages/ScanQR";
-import PayMerchant from "./lib/features/payments/pages/PayMerchant";
-import SungkuSend from "./lib/features/miniapps/pages/SungkuSendHome";
-import KowSyHome from "./lib/features/miniapps/kowSy/KowSyHome";
-import { KowSyExpenses, KowSyChat } from "./lib/features/miniapps/kowSy";
-import KowSyDashboard from "./lib/features/miniapps/kowSy/KowSyDashboard";
-import SungkuSendContacts from "./lib/features/miniapps/pages/SungkuSendContacts";
-import SungkuSendTransfer from "./lib/features/miniapps/pages/SungkuSendTransfer";
-import SungkuSendStatus from "./lib/features/miniapps/pages/SungkuSendStatus";
-import SungkuSendAirtime from "./lib/features/miniapps/pages/SungkuSendAirtime";
-import SungkuSendHistory from "./lib/features/miniapps/pages/SungkuSendHistory";
+import SungkuSend from "./lib/features/miniapps/pages/SungkuSendNew";
 import SungkuSendResult from "./lib/features/miniapps/pages/SungkuSendResult";
 import ProfileInfo from "./pages/profile/ProfileInfo";
 import ProfileCards from "./pages/profile/ProfileCards";
@@ -63,20 +54,9 @@ export const router = createBrowserRouter([
       { path: "legal/terms", Component: TermsOfService },
       { path: "legal/privacy", Component: PrivacyPolicy },
       { path: "receive-money", Component: ReceiveMoney },
-      { path: "pay-merchant", Component: PayMerchant },
       { path: "scan-qr", Component: ScanQR },
       { path: "miniapps/sungku-send", Component: SungkuSend },
-      { path: "miniapps/sungku-send/contacts", Component: SungkuSendContacts },
-      { path: "miniapps/sungku-send/transfer", Component: SungkuSendTransfer },
-      { path: "miniapps/sungku-send/status", Component: SungkuSendStatus },
-      { path: "miniapps/sungku-send/airtime", Component: SungkuSendAirtime },
-      { path: "miniapps/sungku-send/history", Component: SungkuSendHistory },
       { path: "miniapps/sungku-send/result", Component: SungkuSendResult },
-      // Mini app KowSy (ex-Tebe)
-      { path: "miniapps/kowsy", Component: KowSyHome },
-      { path: "miniapps/kowsy/dashboard", Component: KowSyDashboard },
-      { path: "miniapps/kowsy/expenses", Component: KowSyExpenses },
-      { path: "miniapps/kowsy/chat", Component: KowSyChat },
       { path: "*", Component: NotFound },
     ],
   },

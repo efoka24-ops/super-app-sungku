@@ -8,12 +8,9 @@ export interface MiniApp {
   published: boolean;
   featured: boolean;
   installations: number;
-  uniqueUsers?: number;
-  uniquePhones?: number;
   rating: number;
   fileName?: string;
   fileSize?: number;
-  fileUrl?: string;
   uploadedAt?: string;
 }
 
@@ -31,22 +28,24 @@ export async function getMiniAppsCatalog(): Promise<MiniApp[]> {
 }
 
 // Create/Add new mini-app
-export async function createMiniApp(miniApp: Omit<MiniApp, 'id' | 'installations' | 'rating' | 'uploadedAt'>): Promise<MiniApp | null> {
+export async function createMiniApp(miniApp: Omit<MiniApp, 'id' | 'installations' | 'rating'>): Promise<MiniApp | null> {
   try {
-    const response = await fetch(`${ADMIN_API_BASE_URL}/miniapps`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(miniApp)
-    });
+    // Simulate ID generation (in real scenario, backend would generate)
+    const id = Date.now().toString();
+    
+    const newApp: MiniApp = {
+      ...miniApp,
+      id,
+      installations: 0,
+      rating: 0
+    };
 
-    if (!response.ok) {
-      throw new Error('Failed to create mini-app');
-    }
-
-    const data = await response.json();
-    return data.miniApp || null;
+    // In a real implementation, this would POST to a create endpoint
+    // For now, we're storing in local catalog
+    // Backend would need a POST /api/admin/miniapps endpoint
+    
+    console.log('New mini-app to be saved:', newApp);
+    return newApp;
   } catch (error) {
     console.error('Error creating mini-app:', error);
     return null;

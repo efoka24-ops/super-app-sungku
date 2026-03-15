@@ -38,9 +38,9 @@ const paymentActions = [
   {
     icon: Store,
     title: "Payer marchand",
-    description: "Boutiques et services via NotchPay",
+    description: "Boutiques et services",
     color: "bg-amber-500",
-    path: "/pay-merchant",
+    path: "/payments",
   },
 ];
 

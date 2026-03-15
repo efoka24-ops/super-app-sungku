@@ -46,11 +46,7 @@ router.get("/:userId/stats", async (req, res) => {
   const s = statsStore[userId];
 
   if (db) {
-    try {
-      await db.from("profile_stats").upsert({ user_id: userId, transfers: s.transfers || 0, contacts: s.contacts || 0, mini_apps: s.miniApps || 0, updated_at: nowIso() }, { onConflict: "user_id" });
-    } catch {
-      // Keep local profile stats responsive even if remote sync fails.
-    }
+    await db.from("profile_stats").upsert({ user_id: userId, transfers: s.transfers || 0, contacts: s.contacts || 0, mini_apps: s.miniApps || 0, updated_at: nowIso() }, { onConflict: "user_id" }).catch(() => {});
   }
   return res.json({ userId, stats: s });
 });
@@ -68,13 +64,7 @@ router.put("/:userId/stats", async (req, res) => {
   };
   writeCollection("profile-stats.json", statsStore);
   const s = statsStore[userId];
-  if (db) {
-    try {
-      await db.from("profile_stats").upsert({ user_id: userId, transfers: s.transfers, contacts: s.contacts, mini_apps: s.miniApps, updated_at: s.updatedAt }, { onConflict: "user_id" });
-    } catch {
-      // Keep local profile stats responsive even if remote sync fails.
-    }
-  }
+  if (db) await db.from("profile_stats").upsert({ user_id: userId, transfers: s.transfers, contacts: s.contacts, mini_apps: s.miniApps, updated_at: s.updatedAt }, { onConflict: "user_id" }).catch(() => {});
   return res.json({ userId, stats: s });
 });
 
