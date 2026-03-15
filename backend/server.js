@@ -18,7 +18,7 @@ import smsRoutes from "./routes/sms.js";
 import messagesRoutes from "./routes/messages.js";
 
 const app = express();
-const PORT = Number(process.env.PORT || process.env.BACKEND_PORT || 4000);
+const PORT = process.env.PORT ? Number(process.env.PORT) : 4000;
 
 app.use(cors());
 app.use(express.json({ limit: '10mb' })); // Increased limit for avatar uploads
