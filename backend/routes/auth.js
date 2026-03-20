@@ -69,8 +69,8 @@ router.post("/signup", async (req, res) => {
       language: "fr", otp, created_at: now,
     });
     if (error) {
-      console.error("Supabase signup insert:", error.message);
-      return res.status(500).json({ message: "Signup failed" });
+      console.error("Supabase signup insert:", error);
+      return res.status(500).json({ message: "Signup failed", supabaseError: error.message, details: error });
     }
 
     // default notifications in Supabase

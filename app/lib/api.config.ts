@@ -8,7 +8,7 @@ export const API_CONFIG = {
   PRODUCTION:
     import.meta.env.VITE_API_URL ||
     import.meta.env.VITE_BACK4APP_URL ||
-    'https://super-app-sungku.onrender.com',
+    'https://super-app-sungku-7wq4.onrender.com',
 
   // Development - Local
   DEVELOPMENT: 'http://localhost:4000',

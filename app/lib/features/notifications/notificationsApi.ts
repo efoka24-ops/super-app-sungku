@@ -1,6 +1,6 @@
 const API_BASE =
   import.meta.env.VITE_API_URL ||
-  (import.meta.env.PROD ? "https://super-app-sungku.onrender.com/api" : "http://localhost:4000/api");
+  (import.meta.env.PROD ? "https://super-app-sungku-7wq4.onrender.com/api" : "http://localhost:4000/api");
 
 export interface Notification {
   id: string;

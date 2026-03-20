@@ -10,7 +10,7 @@ import SmsService from "../lib/core/network/smsService";
 
 const rawApiUrl =
   (import.meta.env.VITE_API_URL as string | undefined) ||
-  (import.meta.env.PROD ? "https://super-app-sungku.onrender.com" : "http://localhost:4000");
+  (import.meta.env.PROD ? "https://super-app-sungku-7wq4.onrender.com" : "http://localhost:4000");
 const API_BASE_URL = rawApiUrl.replace(/\/$/, "");
 
 export default function SignUp() {

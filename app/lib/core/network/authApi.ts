@@ -1,7 +1,7 @@
 const rawApiUrl =
   import.meta.env.DEV
     ? "/api"
-    : (import.meta.env.VITE_API_URL as string | undefined) || "https://super-app-sungku.onrender.com";
+    : (import.meta.env.VITE_API_URL as string | undefined) || "https://super-app-sungku-7wq4.onrender.com";
 const normalizedBase = rawApiUrl.replace(/\/$/, "");
 const API_BASE = normalizedBase.endsWith("/api") ? normalizedBase : `${normalizedBase}/api`;
 
@@ -42,14 +42,20 @@ export async function signup(data: SignupRequest): Promise<SignupResponse> {
     });
 
     if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.message || "Signup failed");
+      // Tente de parser le message d'erreur, sinon message générique
+      let errorMessage = "Une erreur est survenue lors de l'inscription. Veuillez réessayer.";
+      try {
+        const error = await response.json();
+        if (error && error.message) errorMessage = error.message;
+      } catch {}
+      throw new Error(errorMessage);
     }
 
     return await response.json();
   } catch (error) {
-    console.error("Signup error:", error);
-    throw new Error(`Connexion backend impossible (${API_BASE}/auth/signup)`);
+    // Log technique côté dev uniquement
+    if (import.meta.env.DEV) console.error("Signup error:", error);
+    throw new Error("Impossible de créer le compte. Veuillez vérifier votre connexion ou réessayer plus tard.");
   }
 }
 
