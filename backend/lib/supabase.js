@@ -21,3 +21,8 @@ export function getSupabase() {
       })
     : null;
 }
+
+// Export explicite pour server.js
+export const isSupabaseConfigured = Boolean(
+  process.env.SUPABASE_URL && (process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_PUBLISHABLE_KEY)
+);
